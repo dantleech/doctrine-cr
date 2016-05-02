@@ -11,10 +11,39 @@ class ContentRepositoryTest extends BaseTestCase
      */
     public function testStoreEntity()
     {
-        $entity = new Page();
-        $entity->setTitle('Page One');
+        $page = $this->createPage();
 
-        $this->getEntityManager()->persist($entity);
+        $this->assertEquals(
+            '/Page One', $page->getPath(),
+            'It has updated the path property after flusing'
+        );
+    }
+
+    /**
+     * It should hydrate the path entry fields.
+     */
+    public function testHydratePathEntryFields()
+    {
+        $this->createPage();
+        $this->getEntityManager()->clear();
+
+        $page = $this->getEntityManager()->find(null, '/Page One');
+
+        $this->assertEquals(
+            '/Page One', 
+            $page->getPath(),
+            'It has hydrated the path property'
+        );
+    }
+
+    private function createPage()
+    {
+        $page = new Page();
+        $page->setTitle('Page One');
+
+        $this->getEntityManager()->persist($page);
         $this->getEntityManager()->flush();
+
+        return $page;
     }
 }

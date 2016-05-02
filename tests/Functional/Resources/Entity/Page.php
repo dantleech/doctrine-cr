@@ -4,11 +4,12 @@ namespace DTL\DoctrineCR\Tests\Functional\Resources\Entity;
 
 class Page
 {
-    private $id;
+    private $uuid;
     private $title;
     private $children;
     private $parent;
     private $path;
+    private $contents;
 
     public function getTitle() 
     {

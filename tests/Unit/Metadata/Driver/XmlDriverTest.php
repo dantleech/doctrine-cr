@@ -21,8 +21,8 @@ class XmlDriverTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadMetadata()
     {
-        $reflection = new \ReflectionClass(\stdClass::class);
-        $this->locator->findFileForClass($reflection, 'xml')->willReturn(__DIR__ . '/xml/stdClass1.xml');
+        $reflection = new \ReflectionClass(TestEntity::class);
+        $this->locator->findFileForClass($reflection, 'xml')->willReturn(__DIR__ . '/xml/valid1.xml');
 
         $metadata = $this->driver->loadMetadataForClass($reflection);
 
@@ -35,4 +35,9 @@ class XmlDriverTest extends \PHPUnit_Framework_TestCase
         $property = reset($metadata->propertyMetadata);
         $this->assertEquals('children', $property->getType());
     }
+}
+
+class TestEntity
+{
+    private $children;
 }

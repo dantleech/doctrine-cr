@@ -2,7 +2,7 @@
 
 namespace DTL\DoctrineCR\Path;
 
-class PathEntry
+class Entry
 {
     private $uuid;
     private $path;

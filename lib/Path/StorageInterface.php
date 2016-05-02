@@ -8,5 +8,5 @@ interface StorageInterface
 
     public function lookUpUuid($uuid);
 
-    public function store($path, $targetClassFqn);
+    public function register($path, $targetClassFqn);
 }

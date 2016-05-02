@@ -13,12 +13,20 @@ class XmlDriver extends AbstractFileDriver implements DriverInterface
 {
     const NAMESPACE_URI = 'http://github.com/dantleech/doctrine-cr';
 
+    private $extension;
+
+    public function __construct(FileLocatorInterface $locator, $extension = '.dcm.xml')
+    {
+        parent::__construct($locator);
+        $this->extension = $extension;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getExtension()
     {
-        return 'xml';
+        return $this->extension;
     }
 
     /**
@@ -56,6 +64,9 @@ class XmlDriver extends AbstractFileDriver implements DriverInterface
         );
         $classMetadata->setParentProperty(
             $entityEl->evaluate('string(./cr:parent/@name)')
+        );
+        $classMetadata->setPathProperty(
+            $entityEl->evaluate('string(./cr:path/@name)')
         );
 
         foreach ($entityEl->query('./cr:field') as $fieldEl) {

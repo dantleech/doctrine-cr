@@ -15,7 +15,6 @@ class Schema extends BaseSchema
         $table->addColumn('uuid', 'string', [ 'notnull' => true, 'unique' => true, 'length' => 36]);
         $table->addColumn('path', 'string', [ 'notnull' => true, 'unique' => true]);
         $table->addColumn('target_class_fqn', 'string');
-        $table->addColumn('target_id', 'integer');
         $table->setPrimaryKey(['uuid']);
         $table->addIndex(['uuid', 'path']);
     }

@@ -14,6 +14,12 @@ use DTL\DoctrineCR\Subscriber\CRSubscriber;
 use DTL\DoctrineCR\Path\Storage\DbalStorage;
 use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Page;
 use Symfony\Component\Filesystem\Filesystem;
+use Metadata\MetadataFactory;
+use Metadata\Driver\FileLocator;
+use Doctrine\Common\Persistence\Mapping\Driver\DefaultFileLocator;
+use DTL\DoctrineCR\Metadata\Locator\DoctrineLocator;
+use Doctrine\ORM\Mapping\Driver\XmlDriver as DoctrineXmlDriver;
+use DTL\DoctrineCR\Metadata\Driver\XmlDriver;
 
 class BaseTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -76,8 +82,19 @@ class BaseTestCase extends \PHPUnit_Framework_TestCase
             return $this->entityManager;
         }
 
-        $paths = [ __DIR__ . '/Resources/config/doctrine' ];
-        $config = Setup::createXMLMetadataConfiguration($paths, true);
+        $paths = [ 
+            __DIR__ . '/Resources/config/doctrine'
+        ];
+
+        $config = Setup::createConfiguration($paths, true);
+        $locator = new DefaultFileLocator($paths, '.dcm.xml');
+        $config->setMetadataDriverImpl(new DoctrineXmlDriver($locator));
+
+        $metadataFactory = new MetadataFactory(
+            new XmlDriver(
+                new DoctrineLocator($locator)
+            )
+        );
 
         $this->repository = new DbalStorage($this->getConnection());
 
@@ -86,7 +103,7 @@ class BaseTestCase extends \PHPUnit_Framework_TestCase
             EntityManager::create($this->getConnection(), $config)
         );
         $this->entityManager->getEventManager()->addEventSubscriber(
-            new CRSubscriber($this->repository)
+            new CRSubscriber($this->repository, $metadataFactory)
         );
 
         return $this->entityManager;
