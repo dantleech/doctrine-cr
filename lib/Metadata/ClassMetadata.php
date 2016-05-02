@@ -2,30 +2,52 @@
 
 namespace DTL\DoctrineCR\Metadata;
 
-use Doctrine\ORM\Mapping\ClassMetadata as BaseClassMetadata;
+use Metadata\ClassMetadata as BaseClassMetadata;
 
 class ClassMetadata extends BaseClassMetadata
 {
-    private $isNode;
-    private $uuidPropertyName;
+    private $managed = false;
+    private $uuidProperty;
+    private $nameProperty;
+    private $parentProperty;
 
-    public function getUuidPropertyName() 
+    public function getUuidProperty() 
     {
-        return $this->uuidPropertyName;
+        return $this->uuidProperty;
     }
     
-    public function setUuidPropertyName($uuidPropertyName)
+    public function setUuidProperty($uuidProperty)
     {
-        $this->uuidPropertyName = $uuidPropertyName;
+        $this->uuidProperty = $uuidProperty;
     }
 
-    public function getIsNode() 
+    public function isManaged() 
     {
-        return $this->isNode;
+        return $this->managed;
     }
     
-    public function setIsNode($isNode)
+    public function setManaged($managed)
     {
-        $this->isNode = $isNode;
+        $this->managed = $managed;
+    }
+
+    public function getNameProperty() 
+    {
+        return $this->nameProperty;
+    }
+    
+    public function setNameProperty($nameProperty)
+    {
+        $this->nameProperty = $nameProperty;
+    }
+
+    public function getParentProperty() 
+    {
+        return $this->parentProperty;
+    }
+    
+    public function setParentProperty($parentProperty)
+    {
+        $this->parentProperty = $parentProperty;
     }
 }

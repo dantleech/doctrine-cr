@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:doctrine-cr="http://github.com/dantleech/doctrine-cr">
+
+    <entity name="stdClass">
+
+        <id name="uuid" type="string" />
+
+        <doctrine-cr:managed/>
+        <doctrine-cr:uuid name="uuid"/>
+        <doctrine-cr:name name="title"/>
+        <doctrine-cr:parent name="parent"/>
+
+        <doctrine-cr:field name="children" type="children"/>
+
+    </entity>
+
+</doctrine-mapping>
