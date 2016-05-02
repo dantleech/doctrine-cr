@@ -12,10 +12,11 @@ class Schema extends BaseSchema
     {
         parent::__construct();
         $table = $this->createTable(self::TABLE_NAME);
-        $table->addColumn('uuid', 'string', [ 'notnull' => true, 'unique' => true, 'length' => 36]);
-        $table->addColumn('path', 'string', [ 'notnull' => true, 'unique' => true]);
-        $table->addColumn('target_class_fqn', 'string');
+        $table->addColumn('uuid', 'string', [ 'notnull' => true, 'length' => 36]);
+        $table->addColumn('path', 'string', [ 'notnull' => true ]);
+        $table->addColumn('class_fqn', 'string');
+        $table->addColumn('depth', 'integer');
         $table->setPrimaryKey(['uuid']);
-        $table->addIndex(['uuid', 'path']);
+        $table->addUniqueIndex(['path', 'uuid']);
     }
 }

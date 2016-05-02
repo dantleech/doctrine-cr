@@ -7,6 +7,7 @@ class Entry
     private $uuid;
     private $path;
     private $classFqn;
+    private $depth;
 
     public function __construct(
         $uuid,
@@ -32,5 +33,10 @@ class Entry
     public function getClassFqn() 
     {
         return $this->classFqn;
+    }
+
+    public function getDepth()
+    {
+        return PathHelper::getDepth($this->path);
     }
 }

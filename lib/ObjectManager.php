@@ -22,7 +22,7 @@ class ObjectManager extends EntityManagerDecorator
      */
     public function find($entityName, $id, $lockMode = null, $lockVersion = null)
     {
-        $entry = $this->storage->lookupUuid($id);
+        $entry = $this->storage->lookupByPath($id);
 
         return $this->wrapped->find(
             $entry->getClassFqn(),

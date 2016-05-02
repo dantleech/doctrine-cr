@@ -9,16 +9,25 @@ use DTL\DoctrineCR\Path\StorageInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Metadata\MetadataFactory;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Proxy\ProxyFactory;
+use DTL\DoctrineCR\Helper\PathHelper;
+use DTL\DoctrineCR\Path\Exception\PathNotFoundException;
 
 class CRSubscriber implements EventSubscriber
 {
     private $pathStorage;
     private $metadataFactory;
+    private $proxyFactory;
 
-    public function __construct(StorageInterface $pathStorage, MetadataFactory $metadataFactory)
+    public function __construct(
+        StorageInterface $pathStorage, 
+        MetadataFactory $metadataFactory,
+        ProxyFactory $proxyFactory
+    )
     {
         $this->pathStorage = $pathStorage;
         $this->metadataFactory = $metadataFactory;
+        $this->proxyFactory = $proxyFactory;
     }
 
     public function getSubscribedEvents()
@@ -77,16 +86,40 @@ class CRSubscriber implements EventSubscriber
         $object = $args->getObject();
         $crMetadata = $this->metadataFactory->getMetadataForClass(ClassUtils::getRealClass(get_class($object)));
 
+        // TODO: Only do this if we need it.
+        $pathEntry = $this->pathStorage->lookupByUuid(
+            $crMetadata->getUuidValue($object)
+        );
+
         if ($pathProperty = $crMetadata->getPathProperty()) {
-            $pathEntry = $this->pathStorage->lookUpPath(
-                $crMetadata->getUuidValue($object)
-            );
             $crMetadata->setPropertyValue(
                 $object,
                 $pathProperty,
                 $pathEntry->getPath()
             );
         }
+
+        if ($parentProperty = $crMetadata->getParentProperty()) {
+            $parentPath = PathHelper::getParentPath($pathEntry->getPath());
+
+            // the parent path can be null if it is the root node
+            if ($parentPath !== '/') {
+                $parentEntry = $this->pathStorage->lookupByUuid($parentPath);
+                $parentCrMetadata = $this->metadataFactory->getMetadataForClass($parent->getClassFqn());
+                $parent = $this->proxyFactory->getProxy(
+                    $parentEntry->getClassFqn(),
+                    [ $parentCrMetadata->getUuidProperty() => $parentEntry->getUuid() ]
+                );
+
+                $crMetadata->setPropertyValue(
+                    $object,
+                    $parentProperty,
+                    $parent
+                );
+            }
+        }
+
+        // CHILDREN HERE
     }
 
     public function prePersist(LifecycleEventArgs $args)
@@ -98,10 +131,22 @@ class CRSubscriber implements EventSubscriber
         $name = $crMetadata->getPropertyValue($object, $crMetadata->getNameProperty());
         $parent = $crMetadata->getPropertyValue($object, $crMetadata->getParentProperty());
 
+        $parentPath = '/';
+        if ($parentProperty = $crMetadata->getParentProperty()) {
+            $parent = $crMetadata->getPropertyValue($object, $crMetadata->getParentProperty());
+            if ($parent) {
+                // TODO: Handle proxy objects here
+                // TODO: Use a path registry instead of fetching from the DB every time.
+                $parentEntry = $this->pathStorage->lookupByUuid(
+                    $crMetadata->getUuidValue($parent)
+                );
+                $parentPath = $parentEntry->getPath();
+            }
+        }
+
         if (null === $uuid) {
-            // TODO: use parent path
             $pathEntry = $this->pathStorage->register(
-                '/' . $name,
+                PathHelper::join([$parentPath, $name]),
                 get_class($object)
             );
 

@@ -2,11 +2,15 @@
 
 namespace DTL\DoctrineCR\Path;
 
+use DTL\DoctrineCR\Path\Entry;
+
 interface StorageInterface
 {
-    public function lookUpPath($path);
+    public function lookupByPath($path);
 
-    public function lookUpUuid($uuid);
+    public function lookupByUuid($uuid);
+
+    public function getChildren($path);
 
     public function register($path, $targetClassFqn);
 }

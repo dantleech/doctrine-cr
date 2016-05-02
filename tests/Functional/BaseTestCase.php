@@ -100,10 +100,10 @@ class BaseTestCase extends \PHPUnit_Framework_TestCase
 
         $this->entityManager = new ObjectManager(
             $this->repository,
-            EntityManager::create($this->getConnection(), $config)
+            $entityManager = EntityManager::create($this->getConnection(), $config)
         );
         $this->entityManager->getEventManager()->addEventSubscriber(
-            new CRSubscriber($this->repository, $metadataFactory)
+            new CRSubscriber($this->repository, $metadataFactory, $entityManager->getProxyFactory())
         );
 
         return $this->entityManager;

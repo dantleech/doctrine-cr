@@ -5,13 +5,13 @@ namespace DTL\DoctrineCR\Path\Storage;
 use Doctrine\DBAL\Connection;
 use Ramsey\Uuid\UuidFactory;
 use DTL\DoctrineCR\Path\StorageInterface;
-use DTL\DoctrineCR\Exception\PathNotFoundException;
 use DTL\DoctrineCR\Path\Storage\Dbal\Schema;
 use DTL\DoctrineCR\Path\Entry;
+use DTL\DoctrineCR\Path\Exception\PathNotFoundException;
+use DTL\DoctrineCR\Path\Exception\PathAlreadyRegisteredException;
+use DTL\DoctrineCR\Path\Exception\UuidNotFoundException;
+use DTL\DoctrineCR\Helper\PathHelper;
 
-/**\
- * TODO: Rename lookUp[Uuid|Path] to lookupBy[Uuid|Path]
- */
 class DbalStorage implements StorageInterface
 {
     private $connection;
@@ -26,28 +26,70 @@ class DbalStorage implements StorageInterface
     /**
      * {@inheritdoc}
      */
-    public function lookUpUuid($path)
+    public function lookupByPath($path)
     {
-        return $this->lookUp('path', $path);
+        $entry = $this->lookup('path', $path);
+
+        if (null === $entry) {
+            throw new PathNotFoundException($path);
+        }
+
+        return $entry;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function lookUpPath($uuid)
+    public function lookupByUuid($uuid)
     {
-        return $this->lookUp('uuid', $uuid);
+        $entry = $this->lookup('uuid', $uuid);
+
+        if (null === $entry) {
+            throw new UuidNotFoundException($uuid);
+        }
+
+        return $entry;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function register($path, $targetClassFqn)
+    public function getChildren($path)
     {
-        // TODO: Handle existing paths in a performant way..
+        $pathDepth = PathHelper::getDepth($path);
+
+        $sql = sprintf(
+            'SELECT uuid, path, class_fqn FROM %s WHERE path LIKE ? AND depth > ?',
+            Schema::TABLE_NAME
+        );
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute([
+            sprintf('%s%%', $path),
+            $pathDepth + 1
+        ]);
+        $childrenRows = $stmt->fetchAll();
+        var_dump($childrenRows);die();;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function register($path, $classFqn)
+    {
+        // TODO: Handle existing paths in a performant way..?
+        try {
+            $pathEntry = $this->lookupByPath($path);
+            throw new PathAlreadyRegisteredException(
+                $path,
+                $pathEntry->getUuid(),
+                $pathEntry->getClassFqn()
+            );
+        } catch (PathNotFoundException $e) {
+        }
+
         // TODO: Validate path
         $sql = sprintf(
-            'INSERT INTO %s (uuid, path, target_class_fqn) VALUES (?, ?, ?)',
+            'INSERT INTO %s (uuid, path, class_fqn, depth) VALUES (?, ?, ?, ?)',
             Schema::TABLE_NAME
         );
 
@@ -55,16 +97,17 @@ class DbalStorage implements StorageInterface
         $stmt->execute([
             $uuid = (string) $this->uuidFactory->uuid4(),
             $path,
-            $targetClassFqn
+            $classFqn,
+            PathHelper::getDepth($path)
         ]);
 
-        return new Entry($uuid, $path, $targetClassFqn);
+        return new Entry($uuid, $path, $classFqn);
     }
 
-    private function lookUp($columnName, $identifier)
+    private function lookup($columnName, $identifier)
     {
         $sql = sprintf(
-            'SELECT uuid, path, target_class_fqn FROM %s WHERE %s = ?',
+            'SELECT uuid, path, class_fqn FROM %s WHERE %s = ?',
             Schema::TABLE_NAME,
             $columnName
         );
@@ -73,10 +116,10 @@ class DbalStorage implements StorageInterface
         $stmt->execute([ $identifier ]);
         $row = $stmt->fetch();
 
-        if (null === $row) {
-            throw new PathNotFoundException($path);
+        if (false === $row) {
+            return null;
         }
 
-        return new Entry($row['uuid'], $row['path'], $row['target_class_fqn']);
+        return new Entry($row['uuid'], $row['path'], $row['class_fqn']);
     }
 }
