@@ -82,15 +82,14 @@ class DbalStorage implements StorageInterface
     /**
      * {@inheritdoc}
      */
-    public function register($path, $classFqn)
+    public function commit(Entry $entry)
     {
-        // TODO: Handle existing paths in a performant way..?
         try {
-            $pathEntry = $this->lookupByPath($path);
+            $existingEntry = $this->storage->lookupByPath($entry->getPath());
             throw new PathAlreadyRegisteredException(
                 $path,
-                $pathEntry->getUuid(),
-                $pathEntry->getClassFqn()
+                $existingEntry->getUuid(),
+                $existingEntry->getClassFqn()
             );
         } catch (PathNotFoundException $e) {
         }
@@ -103,7 +102,6 @@ class DbalStorage implements StorageInterface
 
         $stmt = $this->connection->prepare($sql);
         $stmt->execute([
-            $uuid = (string) $this->uuidFactory->uuid4(),
             $path,
             $classFqn,
             PathHelper::getDepth($path)

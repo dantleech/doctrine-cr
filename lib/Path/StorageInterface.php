@@ -12,5 +12,5 @@ interface StorageInterface
 
     public function getChildren($path);
 
-    public function register($path, $targetClassFqn);
+    public function commit(Entry $entry);
 }

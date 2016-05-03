@@ -5,24 +5,30 @@ namespace DTL\DoctrineCR;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Decorator\EntityManagerDecorator;
 use Doctrine\ORM\EntityManagerInterface;
-use DTL\DoctrineCR\Path\StorageInterface;
+use DTL\DoctrineCR\Path\PathManagerInterface;
+use DTL\DoctrineCR\Helper\UuidHelper;
+use DTL\DoctrineCR\Path\PathManager;
 
 class ObjectManager extends EntityManagerDecorator
 {
-    private $storage;
+    private $pathManager;
 
-    public function __construct(StorageInterface $storage, EntityManagerInterface $entityManager)
+    public function __construct(PathManager $pathManager, EntityManagerInterface $entityManager)
     {
         parent::__construct($entityManager);
-        $this->storage = $storage;
+        $this->pathManager = $pathManager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function find($entityName, $id, $lockMode = null, $lockVersion = null)
+    public function find($entityName, $identifier, $lockMode = null, $lockVersion = null)
     {
-        $entry = $this->storage->lookupByPath($id);
+        if (UuidHelper::isUuid($identifier)) {
+            $entry = $this->pathManager->lookupByUuid($identifier);
+        } else {
+            $entry = $this->pathManager->lookupByPath($identifier);
+        }
 
         return $this->wrapped->find(
             $entry->getClassFqn(),
@@ -30,5 +36,16 @@ class ObjectManager extends EntityManagerDecorator
             $lockMode,
             $lockVersion
         );
+    }
+
+    public function move($srcIdentifier, $destPath)
+    {
+        $srcPath = $srcIdentifier;
+
+        if (UuidHelper::isUuid($srcIdentifier)) {
+            $srcPath = $this->pathManager->lookupByUuid($srcIdentifier)->getPath();
+        }
+
+        $this->pathManager->move($srcPath, $destPath);
     }
 }

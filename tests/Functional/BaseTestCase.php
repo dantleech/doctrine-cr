@@ -6,7 +6,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use DTL\DoctrineCR\ObjectManager;
-use DTL\DoctrineCR\Repository\Dbal;
+use DTL\DoctrineCR\NodeManager\Dbal;
 use DTL\DoctrineCR\Path\Storage\Dbal\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
 use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Article;
@@ -20,6 +20,7 @@ use Doctrine\Common\Persistence\Mapping\Driver\DefaultFileLocator;
 use DTL\DoctrineCR\Metadata\Locator\DoctrineLocator;
 use Doctrine\ORM\Mapping\Driver\XmlDriver as DoctrineXmlDriver;
 use DTL\DoctrineCR\Metadata\Driver\XmlDriver;
+use DTL\DoctrineCR\Path\PathManager;
 
 class BaseTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -89,6 +90,7 @@ class BaseTestCase extends \PHPUnit_Framework_TestCase
         $config = Setup::createConfiguration($paths, true);
         $locator = new DefaultFileLocator($paths, '.dcm.xml');
         $config->setMetadataDriverImpl(new DoctrineXmlDriver($locator));
+        $config->setProxyDir($this->getTmpDir());
 
         $metadataFactory = new MetadataFactory(
             new XmlDriver(
@@ -96,14 +98,16 @@ class BaseTestCase extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->repository = new DbalStorage($this->getConnection());
+        $this->pathManager = new PathManager(
+            new DbalStorage($this->getConnection())
+        );
 
         $this->entityManager = new ObjectManager(
-            $this->repository,
+            $this->pathManager,
             $entityManager = EntityManager::create($this->getConnection(), $config)
         );
         $this->entityManager->getEventManager()->addEventSubscriber(
-            new CRSubscriber($this->repository, $metadataFactory, $entityManager)
+            new CRSubscriber($this->pathManager, $metadataFactory, $entityManager)
         );
 
         return $this->entityManager;

@@ -13,22 +13,36 @@ use Doctrine\ORM\EntityManager;
 use DTL\DoctrineCR\Helper\PathHelper;
 use DTL\DoctrineCR\Path\Exception\PathNotFoundException;
 use DTL\DoctrineCR\Collection\ChildrenCollection;
+use DTL\DoctrineCR\Mapping\Mapper;
+use DTL\DoctrineCR\Mapping\MetadataLoader;
+use DTL\DoctrineCR\Mapping\Loader;
+use DTL\DoctrineCR\Path\PathManager;
 
 class CRSubscriber implements EventSubscriber
 {
-    private $pathStorage;
+    private $pathManager;
     private $metadataFactory;
     private $entityManager;
+    private $mapper;
 
     public function __construct(
-        StorageInterface $pathStorage, 
+        PathManager $pathManager, 
         MetadataFactory $metadataFactory,
         EntityManager $entityManager
     )
     {
-        $this->pathStorage = $pathStorage;
+        $this->pathManager = $pathManager;
         $this->metadataFactory = $metadataFactory;
         $this->entityManager = $entityManager;
+
+        $this->loader = new Loader(
+            $pathManager,
+            $metadataFactory,
+            $entityManager
+        );
+        $this->metadataLoader = new MetadataLoader(
+            $this->metadataFactory
+        );
     }
 
     public function getSubscribedEvents()
@@ -36,112 +50,20 @@ class CRSubscriber implements EventSubscriber
         return [
             Events::prePersist,
             Events::postLoad,
+            // pre flush is always raised
+            Events::preFlush, 
             Events::loadClassMetadata,
         ];
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
-        $loaded = true;
-        $dcMetadata = $args->getClassMetadata();
-        $crMetadata = $this->metadataFactory->getMetadataForClass($dcMetadata->getName());
-
-        $uuidProperty = $nameProperty = $parentProperty = null;
-        $uuidProperty = $crMetadata->getUuidProperty();
-        $nameProperty = $crMetadata->getNameProperty();
-        $parentProperty = $crMetadata->getParentProperty();
-
-        if (null === $uuidProperty) {
-            throw new \RuntimeException(
-                'No property has been mapped as a "UUID" field in class "%s"',
-                $crMetadata->getName()
-            );
-        }
-
-        if (null === $nameProperty) {
-            throw new \RuntimeException(
-                'No property has been mapped as a "name" field in class "%s"',
-                $crMetadata->getName()
-            );
-        }
-
-        if (false === $dcMetadata->hasField($uuidProperty)) {
-            $dcMetadata->setIdentifier([$uuidProperty]);
-            $dcMetadata->mapField([
-                'fieldName' => $uuidProperty,
-                'type' => 'string',
-                'length' => 32
-            ]);
-        }
-
-        if (false === $dcMetadata->hasField($nameProperty)) {
-            $dcMetadata->mapField([
-                'fieldName' => $nameProperty,
-                'type' => 'string',
-            ]);
-        }
+        $this->metadataLoader->loadMetadata($args->getClassMetadata());
     }
 
     public function postLoad(LifecycleEventArgs $args)
     {
-        $object = $args->getObject();
-        $crMetadata = $this->metadataFactory->getMetadataForClass(ClassUtils::getRealClass(get_class($object)));
-
-        // TODO: Only do this if we need it.
-        $pathEntry = $this->pathStorage->lookupByUuid(
-            $crMetadata->getUuidValue($object)
-        );
-
-        if ($pathProperty = $crMetadata->getPathProperty()) {
-            $crMetadata->setPropertyValue(
-                $object,
-                $pathProperty,
-                $pathEntry->getPath()
-            );
-        }
-
-        if ($depthProperty = $crMetadata->getDepthProperty()) {
-            $crMetadata->setPropertyValue(
-                $object,
-                $depthProperty,
-                $pathEntry->getDepth()
-            );
-        }
-
-        if ($parentProperty = $crMetadata->getParentProperty()) {
-            $parentPath = PathHelper::getParentPath($pathEntry->getPath());
-
-            // the parent path can be null if it is the root node
-            if ($parentPath !== '/') {
-                $parentEntry = $this->pathStorage->lookupByPath($parentPath);
-                $parentCrMetadata = $this->metadataFactory->getMetadataForClass($parentEntry->getClassFqn());
-                $parent = $this->entityManager->getReference(
-                    $parentEntry->getClassFqn(),
-                    $parentEntry->getUuid()
-                );
-
-                $crMetadata->setPropertyValue(
-                    $object,
-                    $parentProperty,
-                    $parent
-                );
-            }
-        }
-
-        foreach ($crMetadata->getChildrenMappings() as $childrenMapping) {
-
-            $children = new ChildrenCollection(
-                $this->entityManager,
-                $this->metadataFactory,
-                $this->pathStorage,
-                $pathEntry
-            );
-            $crMetadata->setPropertyValue(
-                $object,
-                $childrenMapping->getName(),
-                $children
-            );
-        }
+        $this->loader->mapToObject($args->getObject());
     }
 
     public function prePersist(LifecycleEventArgs $args)
@@ -156,24 +78,33 @@ class CRSubscriber implements EventSubscriber
         $parentPath = '/';
         if ($parentProperty = $crMetadata->getParentProperty()) {
             $parent = $crMetadata->getPropertyValue($object, $crMetadata->getParentProperty());
+
             if ($parent) {
-                // TODO: Handle proxy objects here
                 // TODO: Use a path registry instead of fetching from the DB every time.
-                $parentEntry = $this->pathStorage->lookupByUuid(
+                $parentEntry = $this->pathManager->lookupByUuid(
                     $crMetadata->getUuidValue($parent)
                 );
                 $parentPath = $parentEntry->getPath();
             }
         }
 
+        // if there is no UUID, assume this is a new object
         if (null === $uuid) {
-            $pathEntry = $this->pathStorage->register(
+            $pathEntry = $this->pathManager->register(
                 PathHelper::join([$parentPath, $name]),
                 get_class($object)
             );
 
             $crMetadata->setPropertyValue($object, $crMetadata->getUuidProperty(), $pathEntry->getUuid());
-            $crMetadata->setPropertyValue($object, $crMetadata->getPathProperty(), $pathEntry->getPath());
+
+            // hydrate the object
+            // TODO: is this good?
+            $this->postLoad($args);
         }
+    }
+
+    public function preFlush(PreFlushEventArgs $args)
+    {
+        $this->pathManager->flush();
     }
 }
