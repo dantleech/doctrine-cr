@@ -9,25 +9,26 @@ use DTL\DoctrineCR\Path\StorageInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Metadata\MetadataFactory;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\Proxy\ProxyFactory;
+use Doctrine\ORM\EntityManager;
 use DTL\DoctrineCR\Helper\PathHelper;
 use DTL\DoctrineCR\Path\Exception\PathNotFoundException;
+use DTL\DoctrineCR\Collection\ChildrenCollection;
 
 class CRSubscriber implements EventSubscriber
 {
     private $pathStorage;
     private $metadataFactory;
-    private $proxyFactory;
+    private $entityManager;
 
     public function __construct(
         StorageInterface $pathStorage, 
         MetadataFactory $metadataFactory,
-        ProxyFactory $proxyFactory
+        EntityManager $entityManager
     )
     {
         $this->pathStorage = $pathStorage;
         $this->metadataFactory = $metadataFactory;
-        $this->proxyFactory = $proxyFactory;
+        $this->entityManager = $entityManager;
     }
 
     public function getSubscribedEvents()
@@ -64,7 +65,7 @@ class CRSubscriber implements EventSubscriber
             );
         }
 
-        if (!$dcMetadata->hasField($uuidProperty)) {
+        if (false === $dcMetadata->hasField($uuidProperty)) {
             $dcMetadata->setIdentifier([$uuidProperty]);
             $dcMetadata->mapField([
                 'fieldName' => $uuidProperty,
@@ -73,7 +74,7 @@ class CRSubscriber implements EventSubscriber
             ]);
         }
 
-        if (!$dcMetadata->hasField($nameProperty)) {
+        if (false === $dcMetadata->hasField($nameProperty)) {
             $dcMetadata->mapField([
                 'fieldName' => $nameProperty,
                 'type' => 'string',
@@ -99,16 +100,24 @@ class CRSubscriber implements EventSubscriber
             );
         }
 
+        if ($depthProperty = $crMetadata->getDepthProperty()) {
+            $crMetadata->setPropertyValue(
+                $object,
+                $depthProperty,
+                $pathEntry->getDepth()
+            );
+        }
+
         if ($parentProperty = $crMetadata->getParentProperty()) {
             $parentPath = PathHelper::getParentPath($pathEntry->getPath());
 
             // the parent path can be null if it is the root node
             if ($parentPath !== '/') {
-                $parentEntry = $this->pathStorage->lookupByUuid($parentPath);
-                $parentCrMetadata = $this->metadataFactory->getMetadataForClass($parent->getClassFqn());
-                $parent = $this->proxyFactory->getProxy(
+                $parentEntry = $this->pathStorage->lookupByPath($parentPath);
+                $parentCrMetadata = $this->metadataFactory->getMetadataForClass($parentEntry->getClassFqn());
+                $parent = $this->entityManager->getReference(
                     $parentEntry->getClassFqn(),
-                    [ $parentCrMetadata->getUuidProperty() => $parentEntry->getUuid() ]
+                    $parentEntry->getUuid()
                 );
 
                 $crMetadata->setPropertyValue(
@@ -119,7 +128,20 @@ class CRSubscriber implements EventSubscriber
             }
         }
 
-        // CHILDREN HERE
+        foreach ($crMetadata->getChildrenMappings() as $childrenMapping) {
+
+            $children = new ChildrenCollection(
+                $this->entityManager,
+                $this->metadataFactory,
+                $this->pathStorage,
+                $pathEntry
+            );
+            $crMetadata->setPropertyValue(
+                $object,
+                $childrenMapping->getName(),
+                $children
+            );
+        }
     }
 
     public function prePersist(LifecycleEventArgs $args)

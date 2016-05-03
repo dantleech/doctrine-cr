@@ -4,6 +4,7 @@ namespace DTL\DoctrineCR\Metadata;
 
 use Metadata\ClassMetadata as BaseClassMetadata;
 use Metadata\MergeableInterface;
+use DTL\DoctrineCR\Metadata\Mapping\ChildrenMapping;
 
 class ClassMetadata extends BaseClassMetadata implements MergeableInterface
 {
@@ -12,6 +13,7 @@ class ClassMetadata extends BaseClassMetadata implements MergeableInterface
     private $nameProperty;
     private $parentProperty;
     private $pathProperty;
+    private $childrenMappings = [];
 
     // TODO: Test me
     public function merge(MergeableInterface $metadata)
@@ -108,4 +110,25 @@ class ClassMetadata extends BaseClassMetadata implements MergeableInterface
     {
         $this->pathProperty = $pathProperty;
     }
+
+    public function getDepthProperty() 
+    {
+        return $this->depthProperty;
+    }
+    
+    public function setDepthProperty($depthProperty)
+    {
+        $this->depthProperty = $depthProperty;
+    }
+
+    public function addChildrenMapping(ChildrenMapping $mapping)
+    {
+        $this->childrenMappings[] = $mapping;
+    }
+
+    public function getChildrenMappings() 
+    {
+        return $this->childrenMappings;
+    }
+    
 }

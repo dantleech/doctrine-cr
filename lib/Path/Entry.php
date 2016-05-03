@@ -2,6 +2,8 @@
 
 namespace DTL\DoctrineCR\Path;
 
+use DTL\DoctrineCR\Helper\PathHelper;
+
 class Entry
 {
     private $uuid;

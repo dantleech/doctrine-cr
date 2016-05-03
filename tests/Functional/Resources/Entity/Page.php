@@ -10,6 +10,7 @@ class Page
     private $parent;
     private $path;
     private $contents;
+    private $depth;
 
     public function getTitle() 
     {
@@ -40,5 +41,9 @@ class Page
     {
         $this->parent = $parent;
     }
-    
+
+    public function getDepth() 
+    {
+        return $this->depth;
+    }
 }

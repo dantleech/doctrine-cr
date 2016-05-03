@@ -54,21 +54,29 @@ class DbalStorage implements StorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getChildren($path)
+    public function getChildren($uuid)
     {
+        $entry = $this->lookupByUuid($uuid);
+        $path = $entry->getPath();
         $pathDepth = PathHelper::getDepth($path);
 
         $sql = sprintf(
-            'SELECT uuid, path, class_fqn FROM %s WHERE path LIKE ? AND depth > ?',
+            'SELECT uuid, path, class_fqn FROM %s WHERE path LIKE ? AND depth = ?',
             Schema::TABLE_NAME
         );
         $stmt = $this->connection->prepare($sql);
         $stmt->execute([
-            sprintf('%s%%', $path),
+            $path . '%',
             $pathDepth + 1
         ]);
-        $childrenRows = $stmt->fetchAll();
-        var_dump($childrenRows);die();;
+        $childRows = $stmt->fetchAll();
+
+        $childEntries = [];
+        foreach ($childRows as $childRow) {
+            $childEntries[] = $this->rowToEntry($childRow);
+        }
+
+        return $childEntries;
     }
 
     /**
@@ -120,6 +128,11 @@ class DbalStorage implements StorageInterface
             return null;
         }
 
+        return $this->rowToEntry($row);
+    }
+
+    private function rowToEntry($row)
+    {
         return new Entry($row['uuid'], $row['path'], $row['class_fqn']);
     }
 }

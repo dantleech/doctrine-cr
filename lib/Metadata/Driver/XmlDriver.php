@@ -8,6 +8,7 @@ use Metadata\Driver\FileLocatorInterface;
 use PhpBench\Dom\Document;
 use DTL\DoctrineCR\Metadata\ClassMetadata;
 use DTL\DoctrineCR\Metadata\PropertyMetadata;
+use DTL\DoctrineCR\Metadata\Mapping\ChildrenMapping;
 
 class XmlDriver extends AbstractFileDriver implements DriverInterface
 {
@@ -68,11 +69,14 @@ class XmlDriver extends AbstractFileDriver implements DriverInterface
         $classMetadata->setPathProperty(
             $entityEl->evaluate('string(./cr:path/@name)')
         );
+        $classMetadata->setDepthProperty(
+            $entityEl->evaluate('string(./cr:depth/@name)')
+        );
 
-        foreach ($entityEl->query('./cr:field') as $fieldEl) {
-            $propertyMetadata = new PropertyMetadata($class->getName(), $fieldEl->getAttribute('name'));
-            $propertyMetadata->setType($fieldEl->getAttribute('type'));
-            $classMetadata->addPropertyMetadata($propertyMetadata);
+        foreach ($entityEl->query('./cr:children') as $childrenEl) {
+            $mapping = new ChildrenMapping();
+            $mapping->setName($childrenEl->getAttribute('name'));
+            $classMetadata->addChildrenMapping($mapping);
         }
 
         return $classMetadata;

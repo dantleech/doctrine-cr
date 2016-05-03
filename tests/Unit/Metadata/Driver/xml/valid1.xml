@@ -10,8 +10,7 @@
         <doctrine-cr:uuid name="uuid"/>
         <doctrine-cr:name name="title"/>
         <doctrine-cr:parent name="parent"/>
-
-        <doctrine-cr:field name="children" type="children"/>
+        <doctrine-cr:children name="children"/>
 
     </entity>
 

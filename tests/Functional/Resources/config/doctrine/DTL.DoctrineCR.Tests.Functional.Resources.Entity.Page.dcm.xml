@@ -9,8 +9,9 @@
         <cr:uuid name="uuid"/>
         <cr:name name="title"/>
         <cr:parent name="parent"/>
-        <cr:field name="children" type="children"/>
+        <cr:children name="children"/>
         <cr:path name="path"/>
+        <cr:depth name="depth"/>
 
     </entity>
 
