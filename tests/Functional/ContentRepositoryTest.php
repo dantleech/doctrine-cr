@@ -133,4 +133,19 @@ class ContentRepositoryTest extends BaseTestCase
     public function testImplicitMove()
     {
     }
+
+    private function createPage($name, $parent = null)
+    {
+        $page = new Page();
+        $page->setTitle($name);
+
+        if ($parent) {
+            $page->setParent($parent);
+        }
+
+        $this->getEntityManager()->persist($page);
+        $this->getEntityManager()->flush();
+
+        return $page;
+    }
 }

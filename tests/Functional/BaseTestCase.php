@@ -21,15 +21,18 @@ use DTL\DoctrineCR\Metadata\Locator\DoctrineLocator;
 use Doctrine\ORM\Mapping\Driver\XmlDriver as DoctrineXmlDriver;
 use DTL\DoctrineCR\Metadata\Driver\XmlDriver;
 use DTL\DoctrineCR\Path\PathManager;
+use DTL\DoctrineCR\Tests\Support\Container;
 
 class BaseTestCase extends \PHPUnit_Framework_TestCase
 {
-    private $connection;
-    private $entityManager;
+    private $container;
+    private $dbPath;
 
     protected function setUp()
     {
+        $this->dbPath = $this->getTmpDir() . '/test.db';
         $this->initTmpDir();
+        $this->initSchema();
     }
 
     protected function initTmpDir()
@@ -46,34 +49,44 @@ class BaseTestCase extends \PHPUnit_Framework_TestCase
         return __DIR__ . '/Resources/tmp';
     }
 
-    protected function getConnection()
+    protected function getContainer()
     {
-        if ($this->connection) {
-            return $this->connection;
+        if ($this->container) {
+            return $this->container;    
         }
 
-        $dbName = $this->getTmpDir() . '/test.db';
-        if (file_exists($dbName)) {
-            unlink($dbName);
-        };
-
-        $this->connection = DriverManager::getConnection([
-            'driver' => 'pdo_sqlite',
-            'path' => $dbName,
+        $this->container = new Container([
+            'dbal.connection' => [
+                'driver' => 'pdo_sqlite',
+                'path' => $this->dbPath,
+            ],
+            'orm.config_paths' => [
+                __DIR__ . '/Resources/config/doctrine'
+            ],
+            'orm.proxy_dir' => $this->getTmpDir()
         ]);
 
-        $schema = new Schema();
-        $statements = $schema->toSql($this->connection->getDriver()->getDatabasePlatform());
+        return $this->container;
+    }
 
-        foreach ($statements as $statement) {
-            $this->connection->exec($statement);
-        }
-
-        return $this->connection;
+    protected function getDbalConnection()
+    {
+        return $this->getContainer()->offsetGet('dbal.connection');
     }
 
     protected function initSchema()
     {
+        if (file_exists($this->dbPath)) {
+            unlink($this->dbPath);
+        };
+
+        $schema = new Schema();
+        $statements = $schema->toSql($this->getDbalConnection()->getDriver()->getDatabasePlatform());
+
+        foreach ($statements as $statement) {
+            $this->getDbalConnection()->exec($statement);
+        }
+
         $tool = new SchemaTool($this->getEntityManager());
         $tool->createSchema([
             $this->getEntityManager()->getClassMetadata(Page::class)
@@ -82,53 +95,6 @@ class BaseTestCase extends \PHPUnit_Framework_TestCase
 
     protected function getEntityManager()
     {
-        if ($this->entityManager) {
-            return $this->entityManager;
-        }
-
-        $paths = [ 
-            __DIR__ . '/Resources/config/doctrine'
-        ];
-
-        $config = Setup::createConfiguration($paths, true);
-        $locator = new DefaultFileLocator($paths, '.dcm.xml');
-        $config->setMetadataDriverImpl(new DoctrineXmlDriver($locator));
-        $config->setProxyDir($this->getTmpDir());
-
-        $metadataFactory = new MetadataFactory(
-            new XmlDriver(
-                new DoctrineLocator($locator)
-            )
-        );
-
-        $pathManager = new PathManager(
-            new DbalStorage($this->getConnection())
-        );
-
-        $this->entityManager = new ObjectManager(
-            $pathManager,
-            $entityManager = EntityManager::create($this->getConnection(), $config)
-        );
-        $this->entityManager->getEventManager()->addEventSubscriber(
-            new CRSubscriber($pathManager, $metadataFactory, $entityManager)
-        );
-        $this->initSchema();
-
-        return $this->entityManager;
-    }
-
-    protected function createPage($name, $parent = null)
-    {
-        $page = new Page();
-        $page->setTitle($name);
-
-        if ($parent) {
-            $page->setParent($parent);
-        }
-
-        $this->getEntityManager()->persist($page);
-        $this->getEntityManager()->flush();
-
-        return $page;
+        return $this->getContainer()->offsetGet('dcr.object_manager');
     }
 }

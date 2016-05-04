@@ -12,6 +12,12 @@ class Page
     private $contents;
     private $depth;
 
+    public function getUuid() 
+    {
+        return $this->uuid;
+    }
+    
+
     public function getTitle() 
     {
         return $this->title;
