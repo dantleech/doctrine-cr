@@ -8,6 +8,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use DTL\DoctrineCR\Path\PathManagerInterface;
 use DTL\DoctrineCR\Helper\UuidHelper;
 use DTL\DoctrineCR\Path\PathManager;
+use DTL\DoctrineCR\Events as CREvents;
+use Doctrine\ORM\Event\LifecycleEventArgs;
+
 
 class ObjectManager extends EntityManagerDecorator
 {
@@ -36,6 +39,12 @@ class ObjectManager extends EntityManagerDecorator
             $lockMode,
             $lockVersion
         );
+    }
+
+    public function persist($object)
+    {
+        $this->getEventManager()->dispatchEvent(CREvents::prePersist, new LifecycleEventArgs($object, $this));
+        parent::persist($object);
     }
 
     public function move($srcIdentifier, $destPath)

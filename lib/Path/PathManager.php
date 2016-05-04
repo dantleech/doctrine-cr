@@ -8,6 +8,7 @@ use DTL\DoctrineCR\Helper\PathHelper;
 use DTL\DoctrineCR\Operation\Operation\CreateOperation;
 use DTL\DoctrineCR\Operation\Operation\MoveOperation;
 use DTL\DoctrineCR\Path\Entry;
+use DTL\DoctrineCR\Path\EntryRegistry;
 
 class PathManager
 {
@@ -15,66 +16,86 @@ class PathManager
     private $operationQueue;
     private $rollbackQueue;
     private $uuidFactory;
+    private $entryRegistry;
 
-    public function __construct(StorageInterface $storage, UuidFactory $uuidFactory = null)
+    public function __construct(
+        StorageInterface $storage, 
+        UuidFactory $uuidFactory = null,
+        EntryRegistry $entryRegistry = null
+    )
     {
         $this->storage = $storage;
         $this->uuidFactory = $uuidFactory ?: new UuidFactory();
+        $this->entryRegistry = $entryRegistry ?: new EntryRegistry();
         $this->operationQueue = new \SplQueue();
         $this->rollbackQueue = new \SplQueue();
     }
 
     public function lookupByPath($path)
     {
-        if ($this->registry->hasPath($path)) {
-            return $this->registry->getByPath($path);
+        if ($this->entryRegistry->hasPath($path)) {
+            return $this->entryRegistry->getForPath($path);
         }
 
         $entry = $this->storage->lookupByPath($path);
-        $this->registry->register($entry);
+        $this->entryRegistry->register($entry);
 
         return $entry;
     }
 
     public function lookupByUuid($uuid)
     {
-        return $this->storage->lookupByUuid($uuid);
+        if ($this->entryRegistry->hasUuid($uuid)) {
+            return $this->entryRegistry->getForUuid($uuid);
+        }
+
+        $entry = $this->storage->lookupByUuid($uuid);
+        $this->entryRegistry->register($entry);
+
+        return $entry;
     }
 
     public function getChildren($path)
     {
-        return $this->storage->getChildren($path);
+        $entries = $this->storage->getChildren($path);
+
+        return $entries;
     }
 
-    public function register($path, $classFqn)
+    public function createEntry($path, $classFqn)
     {
         $pathEntry = new Entry(
-            $this->uuidFactory->uuid4(),
+            (string) $this->uuidFactory->uuid4(),
             $path,
             $classFqn,
             PathHelper::getDepth($path)
         );
+        $this->entryRegistry->register($pathEntry);
 
-        $this->operationQueue[] = new CreateOperation($pathEntry);
+        $this->operationQueue->push(new CreateOperation($pathEntry));
 
         return $pathEntry;
     }
 
-    public function move($srcUuid, $destPAth)
+    public function move($srcUuid, $destPath)
     {
-        $this->operationQueue[] = new MoveOperation($srcUuid, $destIdentifier);
+        $this->operationQueue->push(new MoveOperation($srcUuid, $destPath));
     }
 
     public function flush()
     {
+        // TODO: Only support transactions ?
         try {
-            while ($operation = $this->operationQueue->dequeue()) {
-                $operation->commit($this->storage);
+            while (false === $this->operationQueue->isEmpty()) {
+                $operation = $this->operationQueue->dequeue();
+                $operation->commit($this->storage, $this->entryRegistry);
                 $this->rollbackQueue[] = $operation;
             }
         } catch (\Exception $e) {
-            while ($operation = $this->rollbackQueue->dequeue()) {
-                $operation->rollback($this->storage);
+            // TODO: Test rollback
+            while (false === $this->rollbackQueue->isEmpty()) {
+                $operation = $this->rollbackQueue->dequeue();
+                $operation->rollback($this->storage, $this->entryRegistry);
             }
 
             throw new \RuntimeException(

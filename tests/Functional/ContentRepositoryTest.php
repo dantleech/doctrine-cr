@@ -3,6 +3,8 @@
 namespace DTL\DoctrineCR\Tests\Functional;
 
 use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Page;
+use DTL\DoctrineCR\Path\Exception\PathAlreadyRegisteredException;
+use DTL\DoctrineCR\Path\Exception\RegistryException;
 
 class ContentRepositoryTest extends BaseTestCase
 {
@@ -112,28 +114,23 @@ class ContentRepositoryTest extends BaseTestCase
 
     /**
      * ?? What should happen if the path exists?
-     *
-     * @expectedException \DTL\DoctrineCR\Path\Exception\PathAlreadyRegisteredException
-     * @expectedExceptionMessage Path "/Hallo" is already registered to
      */
     public function testExistingPath()
     {
-        $this->createPage('Hallo');
-        $this->createPage('Hallo');
+        try {
+            $this->createPage('Hallo');
+            $this->createPage('Hallo');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(RegistryException::class, $e);
+        }
     }
 
-    private function createPage($name, $parent = null)
+    /**
+     * It should implicitly change the path when changing the parent.
+     *
+     * TODO: This path stuff must be moved to the dbal storage test.
+     */
+    public function testImplicitMove()
     {
-        $page = new Page();
-        $page->setTitle($name);
-
-        if ($parent) {
-            $page->setParent($parent);
-        }
-
-        $this->getEntityManager()->persist($page);
-        $this->getEntityManager()->flush();
-
-        return $page;
     }
 }

@@ -4,6 +4,7 @@ namespace DTL\DoctrineCR\Operation\Operation;
 
 use DTL\DoctrineCR\Operation\OperationInterface;
 use DTL\DoctrineCR\Path\StorageInterface;
+use DTL\DoctrineCR\Path\EntryRegistry;
 
 class MoveOperation implements OperationInterface
 {
@@ -16,13 +17,14 @@ class MoveOperation implements OperationInterface
         $this->destPath = $destPath;
     }
 
-    public function commit(StorageInterface $storage)
+    public function commit(StorageInterface $storage, EntryRegistry $entryRegistry)
     {
-        $this->storage->move($this->srcPath, $this->destPath);
+        $storage->move($this->srcPath, $this->destPath);
+        $entryRegistry->move($this->srcPath, $this->destPath);
     }
 
-    public function rollback(StorageInterface $storage)
+    public function rollback(StorageInterface $storage, EntryRegistry $entryRegistry)
     {
-        $this->storage->move($this->destPath, $this->srcPath);
+        $storage->move($this->destPath, $this->srcPath);
     }
 }

@@ -69,12 +69,15 @@ class BaseTestCase extends \PHPUnit_Framework_TestCase
             $this->connection->exec($statement);
         }
 
+        return $this->connection;
+    }
+
+    protected function initSchema()
+    {
         $tool = new SchemaTool($this->getEntityManager());
         $tool->createSchema([
             $this->getEntityManager()->getClassMetadata(Page::class)
         ]);
-
-        return $this->connection;
     }
 
     protected function getEntityManager()
@@ -98,18 +101,34 @@ class BaseTestCase extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->pathManager = new PathManager(
+        $pathManager = new PathManager(
             new DbalStorage($this->getConnection())
         );
 
         $this->entityManager = new ObjectManager(
-            $this->pathManager,
+            $pathManager,
             $entityManager = EntityManager::create($this->getConnection(), $config)
         );
         $this->entityManager->getEventManager()->addEventSubscriber(
-            new CRSubscriber($this->pathManager, $metadataFactory, $entityManager)
+            new CRSubscriber($pathManager, $metadataFactory, $entityManager)
         );
+        $this->initSchema();
 
         return $this->entityManager;
+    }
+
+    protected function createPage($name, $parent = null)
+    {
+        $page = new Page();
+        $page->setTitle($name);
+
+        if ($parent) {
+            $page->setParent($parent);
+        }
+
+        $this->getEntityManager()->persist($page);
+        $this->getEntityManager()->flush();
+
+        return $page;
     }
 }

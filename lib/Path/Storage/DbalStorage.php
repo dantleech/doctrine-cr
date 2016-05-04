@@ -85,11 +85,10 @@ class DbalStorage implements StorageInterface
     public function commit(Entry $entry)
     {
         try {
-            $existingEntry = $this->storage->lookupByPath($entry->getPath());
+            $existingEntry = $this->lookupByPath($entry->getPath());
             throw new PathAlreadyRegisteredException(
-                $path,
-                $existingEntry->getUuid(),
-                $existingEntry->getClassFqn()
+                $entry,
+                $existingEntry
             );
         } catch (PathNotFoundException $e) {
         }
@@ -102,12 +101,56 @@ class DbalStorage implements StorageInterface
 
         $stmt = $this->connection->prepare($sql);
         $stmt->execute([
-            $path,
-            $classFqn,
-            PathHelper::getDepth($path)
+            $entry->getUuid(),
+            $entry->getPath(),
+            $entry->getClassFqn(),
+            PathHelper::getDepth($entry->getPath())
         ]);
+    }
 
-        return new Entry($uuid, $path, $classFqn);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($uuid)
+    {
+        $sql = sprintf(
+            'DELETE FROM %s WHERE uuid = ?',
+            Schema::TABLE_NAME
+        );
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute([ $uuid ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function move($uuid, $destPath)
+    {
+        $entry = $this->lookupByUuid($uuid);
+        $platform = $this->connection->getDatabasePlatform();
+
+        $sql = sprintf(
+            'UPDATE %s SET path = %s, depth = depth + (:destDepth - %d) WHERE path LIKE :match OR path = :srcPath',
+            Schema::TABLE_NAME,
+            $platform->getConcatExpression(
+                ':destPath',
+                $platform->getSubstringExpression(
+                    'path', 
+                    $platform->getLengthExpression(':srcPath') . ' + 1'
+                )
+            ),
+            (int) $entry->getDepth() // for some reason I cannot bind this value, but it is always an integer.
+        );
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute([ 
+            'destPath' => $destPath,
+            'destDepth' => PathHelper::getDepth($destPath),
+            'match' => $entry->getPath() .'/%',
+            'srcPath' => $entry->getPath(),
+        ]);
     }
 
     private function lookup($columnName, $identifier)

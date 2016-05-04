@@ -13,4 +13,8 @@ interface StorageInterface
     public function getChildren($path);
 
     public function commit(Entry $entry);
+
+    public function remove($uuid);
+
+    public function move($srcUuid, $destPath);
 }
