@@ -190,15 +190,37 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testRemove()
+    {
+        $this->initPaths(
+            [
+                '/path',
+                '/path/to',
+                '/path/to/me',
+                '/foo',
+            ]
+        );
+
+        $this->registry->remove(0);
+
+        $this->assertEquals([
+            '/foo'
+        ], $this->registry->getPaths());
+    }
+
     private function initMove(array $paths, $from, $to)
+    {
+        $this->initPaths($paths);
+        $uuidsByPath = array_flip($paths);
+
+        $this->registry->move($uuidsByPath[$from], $to);
+    }
+
+    private function initPaths(array $paths)
     {
         foreach ($paths as $index => $path) {
             $entry = new Entry((string) $index, $path, 'Cfqn');
             $this->registry->register($entry);
         }
-
-        $uuidsByPath = array_flip($paths);
-
-        $this->registry->move($uuidsByPath[$from], $to);
     }
 }

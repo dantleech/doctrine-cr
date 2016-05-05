@@ -9,6 +9,7 @@ use DTL\DoctrineCR\Operation\Operation\CreateOperation;
 use DTL\DoctrineCR\Operation\Operation\MoveOperation;
 use DTL\DoctrineCR\Path\Entry;
 use DTL\DoctrineCR\Path\EntryRegistry;
+use DTL\DoctrineCR\Operation\Operation\RemoveOperation;
 
 class PathManager
 {
@@ -81,6 +82,12 @@ class PathManager
     {
         $this->operationQueue->push(new MoveOperation($srcUuid, $destPath));
         $this->entryRegistry->move($srcUuid, $destPath);
+    }
+
+    public function remove($uuid)
+    {
+        $this->operationQueue->push(new RemoveOperation($uuid));
+        $this->entryRegistry->remove($uuid);
     }
 
     public function getRegisteredEntries()

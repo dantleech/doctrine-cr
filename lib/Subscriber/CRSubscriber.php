@@ -59,6 +59,7 @@ class CRSubscriber implements EventSubscriber
             CREvents::prePersist,
             CREvents::postPersist,
             CREvents::postMove,
+            Events::preRemove,
             Events::postLoad,
             // pre flush is always raised
             Events::preFlush, 
@@ -94,6 +95,18 @@ class CRSubscriber implements EventSubscriber
     public function preFlush(PreFlushEventArgs $args)
     {
         $this->pathManager->flush();
+    }
+
+    public function preRemove(LifecycleEventArgs $args)
+    {
+        $object = $args->getObject();
+        $metadata = $this->metadataFactory->getMetadataForClass(ClassUtils::getRealClass(get_class($object)));
+
+        if (!$metadata->isManaged()) {
+            return;
+        }
+
+        $this->pathManager->remove($metadata->getUuidValue($object));
     }
 
     /**

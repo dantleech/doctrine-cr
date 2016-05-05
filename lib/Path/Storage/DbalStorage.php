@@ -114,13 +114,18 @@ class DbalStorage implements StorageInterface
      */
     public function remove($uuid)
     {
+        $entry = $this->lookupByUuid($uuid);
+
         $sql = sprintf(
-            'DELETE FROM %s WHERE uuid = ?',
+            'DELETE FROM %s WHERE path LIKE :match OR uuid = :uuid',
             Schema::TABLE_NAME
         );
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute([ $uuid ]);
+        $stmt->execute([ 
+            'match' => $entry->getPath() . '/%',
+            'uuid' => $entry->getUuid()
+        ]);
     }
 
     /**

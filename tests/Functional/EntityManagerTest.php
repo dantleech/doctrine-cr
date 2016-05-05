@@ -5,6 +5,7 @@ namespace DTL\DoctrineCR\Tests\Functional;
 use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Page;
 use DTL\DoctrineCR\Path\Exception\PathAlreadyRegisteredException;
 use DTL\DoctrineCR\Path\Exception\RegistryException;
+use DTL\DoctrineCR\Path\Exception\NotFoundException;
 
 class EntityManagerTest extends BaseTestCase
 {
@@ -179,6 +180,48 @@ class EntityManagerTest extends BaseTestCase
             $persistedEntry->getPath(),
             'Path change has been persisted after flush'
         );
+    }
+
+    /**
+     * It should remove the entity and its related path entry.
+     */
+    public function testRemove()
+    {
+        $page1 = $this->createPage('Foobar');
+        $page2 = $this->createPage('Barfoo', $page1);
+        $page3 = $this->createPage('BarBar');
+
+        $this->getEntityManager()->remove($page1);
+        $this->getEntityManager()->flush();
+
+        try {
+            $this->getStorage()->lookupByUuid($page1->getUuid());
+            $this->fail('UUID still exists after remove');
+        } catch (NotFoundException $e) {
+        }
+
+        try {
+            $this->getStorage()->lookupByUuid($page2->getUuid());
+            $this->fail('UUID of sub-node still exists after remove');
+        } catch (NotFoundException $e) {
+        }
+    }
+
+    /**
+     * It should allow a path to be replaced via. a move within a single session.
+     */
+    public function testReplace()
+    {
+        $page1 = $this->createPage('Foobar');
+        $page2 = $this->createPage('BarFoo');
+        $page3 = $this->createPage('BarBar');
+
+        $this->getEntityManager()->remove($page1);
+        $this->getEntityManager()->move('/BarFoo', '/Foobar');
+        $this->getEntityManager()->flush();
+
+        $page = $this->getEntityManager()->find(null, '/Foobar');
+        $this->assertEquals($page2->getUuid(), $page->getUuid());
     }
 
     private function getStorage()

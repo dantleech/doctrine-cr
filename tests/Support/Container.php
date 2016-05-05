@@ -86,14 +86,14 @@ class Container extends BaseContainer
             return new DbalStorage($container['dbal.connection']);
         };
 
-        $this['dcr.path_manager'] = function (Container $container) {
+        $this['dcr.path.manager'] = function (Container $container) {
             return new PathManager(
                 $container['dcr.path.storage.dbal']
             );
         };
 
         $this['dcr.subscriber'] = function (Container $container) {
-            return new CRSubscriber($container['dcr.path_manager'], $container['dcr.metadata.factory'], $container['orm.entity_manager']);
+            return new CRSubscriber($container['dcr.path.manager'], $container['dcr.metadata.factory'], $container['orm.entity_manager']);
         };
 
         $this['dcr.object_manager'] = function (Container $container) {
@@ -102,7 +102,7 @@ class Container extends BaseContainer
             );
 
             return new ObjectManager(
-                $container['dcr.path_manager'],
+                $container['dcr.path.manager'],
                 $container['orm.entity_manager']
             );
         };

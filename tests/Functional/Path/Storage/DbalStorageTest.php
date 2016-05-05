@@ -95,6 +95,40 @@ class DbalStorageTest extends BaseTestCase
         ];
     }
 
+    /**
+     * It should remove.
+     *
+     * @dataProvider provideRemove
+     */
+    public function testRemove($description, $pages, $removePath, $expectedEntries)
+    {
+        $pages = $this->createPages($pages);
+        $this->getStorage()->remove($pages[$removePath]->getUuid());
+        $this->assertEntries($expectedEntries, $description);
+    }
+
+    public function provideRemove()
+    {
+        return [
+            [
+                'Removing path with descendants',
+                [ 
+                    'Parent Page' => [
+                        'Child 1' => [
+                            'My Page' => [
+                            ]
+                        ]
+                    ],
+                    'Another Page' => []
+                ],
+                '/Parent Page',
+                [
+                    [ 'path' => '/Another Page' ],
+                ]
+            ],
+        ];
+    }
+
     private function assertEntries(array $entryAssertions, $description)
     {
         $stmt = $this->getDbalConnection()->query('SELECT path, depth FROM doctrine_content_repository_paths ORDER by depth');
@@ -103,6 +137,8 @@ class DbalStorageTest extends BaseTestCase
         $rowText = array_reduce($rows, function ($cur, $row) {
             return $cur . sprintf('path: %s, depth: %s' . PHP_EOL, $row['path'], $row['depth']);
         });
+
+        $this->assertCount(count($entryAssertions), $rows, 'Number of rows match number of assertions');
 
         foreach ($entryAssertions as $index => $entryAssertion) {
             $this->assertArrayHasKey($index, $rows, 'Row exists');

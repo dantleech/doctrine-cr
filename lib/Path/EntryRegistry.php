@@ -71,7 +71,7 @@ class EntryRegistry
             // allow update entries to be dequeued (i.e. to load the new properties
             // onto the related entity).
             $this->updateQueue->enqueue($newEntry);
-            $this->remove($newEntry->getUuid());
+            $this->removeSingle($newEntry->getUuid());
             $this->register($newEntry);
         }
     }
@@ -113,8 +113,22 @@ class EntryRegistry
     public function remove($uuid)
     {
         $entry = $this->getForUuid($uuid);
-        unset($this->uuidsByPath[$entry->getPath()]);
+        $uuids = $this->uuidsByPath;
+
+        foreach ($uuids as $path => $uuid) {
+            if (false === PathHelper::isSelfOrDescendant($entry->getPath(), $path)) {
+                continue;
+            }
+
+            $this->removeSingle($uuid);
+        }
+    }
+
+    private function removeSingle($uuid)
+    {
+        $entry = $this->getForUuid($uuid);
         unset($this->entries[$uuid]);
+        unset($this->uuidsByPath[$entry->getPath()]);
     }
 
     public function getPaths()

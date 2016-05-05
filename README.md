@@ -78,11 +78,14 @@ TODO:
 [x] Children collection + depth + others on persist.
 [x] Path\\Entry caching
 [x] Implicit move
-[ ] Explicit move
-[ ] Remove
+[x] Explicit move
+[x] Remove
 [ ] XSL Schema
 [ ] Generalize lookUpBy / lookupFor / getByUuid / etc.
 [ ] Rename CREvents to DcrEvents
 [ ] Rename CRSubscriber to DcrSubscriber
+[ ] Failed transaction (move, remove): restore original state or retain
+    currently invalid state?
+[ ] Reverse argument order of PathHelper::isSelfOrDescendant
 
 [ ] Metadata cache
