@@ -73,7 +73,7 @@ class CRSubscriber implements EventSubscriber
         $this->loader->mapToObject($args->getObject());
     }
 
-    public function prePersistCR(LifecycleEventArgs $args)
+    public function dcrPrePersist(LifecycleEventArgs $args)
     {
         $new = $this->persister->persist($args->getObject());
         $this->loader->mapToObject($args->getObject());
@@ -81,6 +81,11 @@ class CRSubscriber implements EventSubscriber
 
     public function preFlush(PreFlushEventArgs $args)
     {
-        $this->pathManager->flush();
+        $objects = $this->pathManager->flush();
+
+        foreach ($this->pathManager->getRegisteredEntries() as $entry) {
+            $entity = $this->entityManager->find($entry->getClassFqn(), $entry->getUuid());
+            $this->loader->mapToObject($entity);
+        }
     }
 }

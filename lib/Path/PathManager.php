@@ -82,9 +82,19 @@ class PathManager
         $this->operationQueue->push(new MoveOperation($srcUuid, $destPath));
     }
 
+    public function getRegisteredEntries()
+    {
+        return $this->entryRegistry->getEntries();
+    }
+
+    public function getRegisteredPaths()
+    {
+        return $this->entryRegistry->getPaths();
+    }
+
     public function flush()
     {
-        // TODO: Only support transactions ?
+        // TODO: Only support real transactions ?
         try {
             while (false === $this->operationQueue->isEmpty()) {
                 $operation = $this->operationQueue->dequeue();

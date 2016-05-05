@@ -96,4 +96,75 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
         $pathEntry = new Entry('1234', '/path/to/2', 'ClassFqn');
         $this->registry->register($pathEntry);
     }
+
+    /**
+     * It should move paths.
+     *
+     * @dataProvider provideMove
+     */
+    public function testMove(array $paths, $from, $to, array $expectedPaths)
+    {
+        foreach ($paths as $index => $path) {
+            $entry = new Entry((string) $index, $path, 'Cfqn');
+            $this->registry->register($entry);
+        }
+
+        $this->registry->move($from, $to);
+
+        // check the paths updated
+        $this->assertEquals($expectedPaths, $this->registry->getPaths());
+
+        // check the entries updated
+        $paths = [];
+
+        foreach ($this->registry->getEntries() as $entry) {
+            $paths[] = $entry->getPath();
+        }
+
+        $this->assertEquals($expectedPaths, $paths);
+    }
+
+    public function provideMove()
+    {
+        return [
+            [
+                [
+                    '/one/1/2/3',
+                    '/one/1/2',
+                    '/two',
+                ],
+                '/two',
+                '/one/1/2/3/two',
+                [
+                    '/one/1/2/3',
+                    '/one/1/2',
+                    '/one/1/2/3/two',
+                ]
+            ],
+            [
+                [
+                    '/one/1/2/3',
+                    '/one/1/2',
+                    '/two',
+                ],
+                '/one',
+                '/two/one',
+                [
+                    '/two',
+                    '/two/one/1/2/3',
+                    '/two/one/1/2',
+                ]
+            ],
+            [
+                [
+                    '/one',
+                ],
+                '/one',
+                '/two',
+                [
+                    '/two',
+                ]
+            ],
+        ];
+    }
 }

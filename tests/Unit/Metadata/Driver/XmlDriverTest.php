@@ -22,7 +22,7 @@ class XmlDriverTest extends \PHPUnit_Framework_TestCase
     public function testLoadMetadata()
     {
         $reflection = new \ReflectionClass(TestEntity::class);
-        $this->locator->findFileForClass($reflection, 'xml')->willReturn(__DIR__ . '/xml/valid1.xml');
+        $this->locator->findFileForClass($reflection, '.dcm.xml')->willReturn(__DIR__ . '/xml/valid1.xml');
 
         $metadata = $this->driver->loadMetadataForClass($reflection);
 
@@ -31,9 +31,8 @@ class XmlDriverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('title', $metadata->getNameProperty());
         $this->assertEquals('parent', $metadata->getParentProperty());
 
-        $this->assertCount(1, $metadata->propertyMetadata);
-        $property = reset($metadata->propertyMetadata);
-        $this->assertEquals('children', $property->getType());
+        $this->assertCount(1, $mappings = $metadata->getChildrenMappings());
+        $this->assertEquals('children', $mappings[0]->getName());
     }
 }
 

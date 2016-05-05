@@ -6,7 +6,7 @@ use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Page;
 use DTL\DoctrineCR\Path\Exception\PathAlreadyRegisteredException;
 use DTL\DoctrineCR\Path\Exception\RegistryException;
 
-class ContentRepositoryTest extends BaseTestCase
+class EntityManagerTest extends BaseTestCase
 {
     /**
      * It should store an Entity at a given path.
@@ -132,6 +132,24 @@ class ContentRepositoryTest extends BaseTestCase
      */
     public function testImplicitMove()
     {
+        $page1 = $this->createPage('Foobar');
+        $page2 = $this->createPage('Barfoo', $page1);
+        $page3 = $this->createPage('BarBar');
+
+        $page3->setParent($page2);
+        $this->getEntityManager()->persist($page3);
+
+        $this->assertEquals(
+            '/BarBar', $page3->getPath(), 
+            'Path is still "/BarBar"'
+        );
+
+        $this->getEntityManager()->flush();
+
+        $this->assertEquals(
+            '/Foobar/Barfoo/BarBar', $page3->getPath(), 
+            'Path correctly updated after flush'
+        );
     }
 
     private function createPage($name, $parent = null)

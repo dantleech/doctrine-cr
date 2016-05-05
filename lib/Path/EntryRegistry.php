@@ -36,17 +36,16 @@ class EntryRegistry
         $this->uuidsByPath[$entry->getPath()] = $entry->getUuid();
     }
 
-    // TODO: Test!
     public function move($srcPath, $destPath)
     {
         foreach ($this->entries as $uuid => $entry) {
-            if ($entry->getPath() === $srcPath || 0 === strpos($entry->getPath(), $srcPath . '/')) {
+            if ($entry->getPath() === $srcPath || 0 === strpos($entry->getPath(),  $srcPath . '/')) {
                 $newEntry = new Entry(
                     $entry->getUuid(),
                     $destPath . substr($entry->getPath(), strlen($srcPath)),
                     $entry->getClassFqn()
                 );
-                $this->remove($uuid);
+                $this->remove($newEntry->getUuid());
                 $this->register($newEntry);
             }
         }
@@ -91,5 +90,15 @@ class EntryRegistry
         $entry = $this->getForUuid($uuid);
         unset($this->uuidsByPath[$entry->getPath()]);
         unset($this->entries[$uuid]);
+    }
+
+    public function getPaths()
+    {
+        return array_keys($this->uuidsByPath);
+    }
+
+    public function getEntries()
+    {
+        return $this->entries;
     }
 }

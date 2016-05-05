@@ -4,5 +4,5 @@ namespace DTL\DoctrineCR;
 
 class Events
 {
-    const prePersist = 'prePersistCR';
+    const prePersist = 'dcrPrePersist';
 }
