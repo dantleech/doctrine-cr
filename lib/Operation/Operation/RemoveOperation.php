@@ -7,4 +7,3 @@ use DTL\DoctrineCR\Path\StorageInterface;
 
 class RemoveOperation implements OperationInterface
 {
-}

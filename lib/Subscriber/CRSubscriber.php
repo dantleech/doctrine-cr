@@ -20,6 +20,7 @@ use DTL\DoctrineCR\Mapping\Loader;
 use DTL\DoctrineCR\Path\PathManager;
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use DTL\DoctrineCR\Mapping\Persister;
+use DTL\DoctrineCR\Event\MoveEvent;
 
 class CRSubscriber implements EventSubscriber
 {
@@ -31,7 +32,7 @@ class CRSubscriber implements EventSubscriber
     public function __construct(
         PathManager $pathManager, 
         MetadataFactory $metadataFactory,
-        EntityManager $entityManager
+        EntityManager $entityManager // TODO: This is available in the event, not required here.
     )
     {
         $this->pathManager = $pathManager;
@@ -56,6 +57,8 @@ class CRSubscriber implements EventSubscriber
     {
         return [
             CREvents::prePersist,
+            CREvents::postPersist,
+            CREvents::postMove,
             Events::postLoad,
             // pre flush is always raised
             Events::preFlush, 
@@ -76,16 +79,34 @@ class CRSubscriber implements EventSubscriber
     public function dcrPrePersist(LifecycleEventArgs $args)
     {
         $new = $this->persister->persist($args->getObject());
-        $this->loader->mapToObject($args->getObject());
+    }
+
+    public function dcrPostPersist(LifecycleEventArgs $args)
+    {
+        $this->updateEntities();
+    }
+
+    public function dcrPostMove(MoveEvent $args)
+    {
+        $this->updateEntities();
     }
 
     public function preFlush(PreFlushEventArgs $args)
     {
-        $objects = $this->pathManager->flush();
+        $this->pathManager->flush();
+    }
 
-        foreach ($this->pathManager->getRegisteredEntries() as $entry) {
-            $entity = $this->entityManager->find($entry->getClassFqn(), $entry->getUuid());
-            $this->loader->mapToObject($entity);
+    /**
+     * Update any entities that have been affected by a path change.
+     */
+    private function updateEntities()
+    {
+        $updateQueue = $this->pathManager->getUpdateQueue();
+
+        while (false === $updateQueue->isEmpty()) {
+            $entry = $updateQueue->dequeue();
+            $object = $this->entityManager->find($entry->getClassFqn(), $entry->getUuid());
+            $this->loader->mapToObject($object);
         }
     }
 }

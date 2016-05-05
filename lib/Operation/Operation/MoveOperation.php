@@ -8,23 +8,22 @@ use DTL\DoctrineCR\Path\EntryRegistry;
 
 class MoveOperation implements OperationInterface
 {
-    private $srcPath;
+    private $srcUuid;
     private $destPath;
 
-    public function __construct($srcPath, $destPath)
+    public function __construct($srcUuid, $destPath)
     {
-        $this->srcPath = $srcPath;
+        $this->srcUuid = $srcUuid;
         $this->destPath = $destPath;
     }
 
     public function commit(StorageInterface $storage, EntryRegistry $entryRegistry)
     {
-        $storage->move($this->srcPath, $this->destPath);
-        $entryRegistry->move($this->srcPath, $this->destPath);
+        $storage->move($this->srcUuid, $this->destPath);
     }
 
     public function rollback(StorageInterface $storage, EntryRegistry $entryRegistry)
     {
-        $storage->move($this->destPath, $this->srcPath);
+        $storage->move($this->destPath, $this->srcUuid);
     }
 }

@@ -80,6 +80,7 @@ class PathManager
     public function move($srcUuid, $destPath)
     {
         $this->operationQueue->push(new MoveOperation($srcUuid, $destPath));
+        $this->entryRegistry->move($srcUuid, $destPath);
     }
 
     public function getRegisteredEntries()
@@ -90,6 +91,11 @@ class PathManager
     public function getRegisteredPaths()
     {
         return $this->entryRegistry->getPaths();
+    }
+
+    public function getUpdateQueue()
+    {
+        return $this->entryRegistry->getUpdateQueue();
     }
 
     public function flush()

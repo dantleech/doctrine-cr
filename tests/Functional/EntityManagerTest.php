@@ -140,8 +140,8 @@ class EntityManagerTest extends BaseTestCase
         $this->getEntityManager()->persist($page3);
 
         $this->assertEquals(
-            '/BarBar', $page3->getPath(), 
-            'Path is still "/BarBar"'
+            '/Foobar/Barfoo/BarBar', $page3->getPath(), 
+            'Path correctly updated after persist'
         );
 
         $this->getEntityManager()->flush();
@@ -150,6 +150,40 @@ class EntityManagerTest extends BaseTestCase
             '/Foobar/Barfoo/BarBar', $page3->getPath(), 
             'Path correctly updated after flush'
         );
+    }
+
+    /**
+     * It should explicitly move a document
+     */
+    public function testExplicitMove()
+    {
+        $page1 = $this->createPage('Foobar');
+        $page2 = $this->createPage('Barfoo', $page1);
+        $page3 = $this->createPage('BarBar');
+
+        $this->getEntityManager()->move($page3->getPath(), $page2->getPath() . '/BarBar');
+        $this->assertEquals('/Foobar/Barfoo/BarBar', $page3->getPath());
+
+        $persistedEntry = $this->getStorage()->lookupByUuid($page3->getUuid());
+        $this->assertEquals(
+            '/BarBar', 
+            $persistedEntry->getPath(),
+            'Path change has not been persisted'
+        );
+
+        $this->getEntityManager()->flush();
+
+        $persistedEntry = $this->getStorage()->lookupByUuid($page3->getUuid());
+        $this->assertEquals(
+            '/Foobar/Barfoo/BarBar', 
+            $persistedEntry->getPath(),
+            'Path change has been persisted after flush'
+        );
+    }
+
+    private function getStorage()
+    {
+        return $this->getContainer()->offsetGet('dcr.path.storage.dbal');
     }
 
     private function createPage($name, $parent = null)

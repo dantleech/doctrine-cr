@@ -10,6 +10,7 @@ use DTL\DoctrineCR\Helper\UuidHelper;
 use DTL\DoctrineCR\Path\PathManager;
 use DTL\DoctrineCR\Events as CREvents;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use DTL\DoctrineCR\Event\MoveEvent;
 
 
 class ObjectManager extends EntityManagerDecorator
@@ -44,17 +45,19 @@ class ObjectManager extends EntityManagerDecorator
     public function persist($object)
     {
         $this->getEventManager()->dispatchEvent(CREvents::prePersist, new LifecycleEventArgs($object, $this));
-        parent::persist($object);
+        $this->wrapped->persist($object);
+        $this->getEventManager()->dispatchEvent(CREvents::postPersist, new LifecycleEventArgs($object, $this));
     }
 
     public function move($srcIdentifier, $destPath)
     {
-        $srcPath = $srcIdentifier;
+        $srcUuid = $srcIdentifier;
 
-        if (UuidHelper::isUuid($srcIdentifier)) {
-            $srcPath = $this->pathManager->lookupByUuid($srcIdentifier)->getPath();
+        if (false === UuidHelper::isUuid($srcIdentifier)) {
+            $srcUuid = $this->pathManager->lookupByPath($srcIdentifier)->getUuid();
         }
 
-        $this->pathManager->move($srcPath, $destPath);
+        $this->pathManager->move($srcUuid, $destPath);
+        $this->getEventManager()->dispatchEvent(CREvents::postMove, new MoveEvent($this, $srcIdentifier, $destPath));
     }
 }

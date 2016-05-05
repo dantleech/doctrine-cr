@@ -104,12 +104,7 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function testMove(array $paths, $from, $to, array $expectedPaths)
     {
-        foreach ($paths as $index => $path) {
-            $entry = new Entry((string) $index, $path, 'Cfqn');
-            $this->registry->register($entry);
-        }
-
-        $this->registry->move($from, $to);
+        $this->initMove($paths, $from, $to);
 
         // check the paths updated
         $this->assertEquals($expectedPaths, $this->registry->getPaths());
@@ -143,6 +138,7 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
+                    '/one',
                     '/one/1/2/3',
                     '/one/1/2',
                     '/two',
@@ -151,6 +147,7 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
                 '/two/one',
                 [
                     '/two',
+                    '/two/one',
                     '/two/one/1/2/3',
                     '/two/one/1/2',
                 ]
@@ -166,5 +163,42 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
         ];
+    }
+
+    /**
+     * It should throw exceptions on invalid move operations.
+     *
+     * @dataProvider provideInvalidMove
+     */
+    public function testInvalidMove(array $paths, $from, $to, $expectedMessage)
+    {
+        $this->setExpectedException(\InvalidArgumentException::class, $expectedMessage);
+        $this->initMove($paths, $from, $to);
+    }
+
+    public function provideInvalidMove()
+    {
+        return [
+            [
+                [
+                    '/two',
+                ],
+                '/two',
+                '/two/two',
+                'Error moving entry from "/two" to "/two/two", cannot move a node onto itself or one of its descendants.'
+            ],
+        ];
+    }
+
+    private function initMove(array $paths, $from, $to)
+    {
+        foreach ($paths as $index => $path) {
+            $entry = new Entry((string) $index, $path, 'Cfqn');
+            $this->registry->register($entry);
+        }
+
+        $uuidsByPath = array_flip($paths);
+
+        $this->registry->move($uuidsByPath[$from], $to);
     }
 }

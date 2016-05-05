@@ -33,11 +33,6 @@ class ClassMetadata extends BaseClassMetadata implements MergeableInterface
         if ($metadata->getPathProperty()) {
             $this->pathProperty = $metadata->getPathProperty();
         }
-
-        // TODO: Test this
-        foreach ($metadata->propertyMetadata as $name => $property) {
-            $this->propertyMetadata[$name] = $property;
-        }
     }
 
     public function getUuidValue($object)

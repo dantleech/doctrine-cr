@@ -28,6 +28,11 @@ class PathHelper
         return substr($path, 0, $pos);
     }
 
+    public function isSelfOrDescendant($selfPath, $candidatePath)
+    {
+        return $candidatePath === $selfPath || 0 === strpos($candidatePath, $selfPath . '/');
+    }
+
     public static function join($segments)
     {
         $segments = self::segmentsToNames($segments);

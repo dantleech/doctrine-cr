@@ -119,4 +119,27 @@ class PathHelperTest extends \PHPUnit_Framework_TestCase
             [ '//', 'Found an empty element in segment "//"' ],
         ];
     }
+
+    /**
+     * It should say if a given path is the same or a descedant of it.
+     *
+     * @dataProvider provideIsSelfOrDescendant
+     */
+    public function testIsSelfOrDescendant($self, $candidate, $expected)
+    {
+        $result = PathHelper::isSelfOrDescendant($self, $candidate);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function provideIsSelfOrDescendant()
+    {
+        return [
+            [ '/foo', '/foo', true ],
+            [ '/foo', '/foo/bar', true ],
+            [ '/foo', '/foo/bar/boo', true ],
+            [ '/bar', '/foo', false ],
+            [ '/bar', '/foo/foo', false ],
+            [ '/two', '/one/1/2/3/two', false ],
+        ];
+    }
 }

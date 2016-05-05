@@ -3,11 +3,18 @@
 namespace DTL\DoctrineCR\Path;
 
 use DTL\DoctrineCR\Path\Exception\RegistryException;
+use DTL\DoctrineCR\Helper\PathHelper;
 
 class EntryRegistry
 {
     private $entries = [];
     private $uuidsByPath = [];
+    private $updateQueue;
+
+    public function __construct()
+    {
+        $this->updateQueue = new \SplQueue();
+    }
 
     public function register(Entry $entry)
     {
@@ -34,20 +41,38 @@ class EntryRegistry
 
         $this->entries[$entry->getUuid()] = $entry;
         $this->uuidsByPath[$entry->getPath()] = $entry->getUuid();
+        $this->updateQueue->enqueue($entry);
     }
 
-    public function move($srcPath, $destPath)
+    public function move($srcUuid, $destPath)
     {
+        $srcEntry = $this->getForUuid($srcUuid);
+
+        if (PathHelper::isSelfOrDescendant($srcEntry->getPath(), $destPath)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Error moving entry from "%s" to "%s", cannot move a node onto itself or one of its descendants.',
+                $srcEntry->getPath(), $destPath
+            ));
+        }
+
+        $srcPath = $srcEntry->getPath();
+
         foreach ($this->entries as $uuid => $entry) {
-            if ($entry->getPath() === $srcPath || 0 === strpos($entry->getPath(),  $srcPath . '/')) {
-                $newEntry = new Entry(
-                    $entry->getUuid(),
-                    $destPath . substr($entry->getPath(), strlen($srcPath)),
-                    $entry->getClassFqn()
-                );
-                $this->remove($newEntry->getUuid());
-                $this->register($newEntry);
+            if (false === PathHelper::isSelfOrDescendant($srcPath, $entry->getPath())) {
+               continue;
             }
+
+            $newEntry = new Entry(
+                $entry->getUuid(),
+                $destPath . substr($entry->getPath(), strlen($srcPath)),
+                $entry->getClassFqn()
+            );
+
+            // allow update entries to be dequeued (i.e. to load the new properties
+            // onto the related entity).
+            $this->updateQueue->enqueue($newEntry);
+            $this->remove($newEntry->getUuid());
+            $this->register($newEntry);
         }
     }
 
@@ -100,5 +125,10 @@ class EntryRegistry
     public function getEntries()
     {
         return $this->entries;
+    }
+
+    public function getUpdateQueue()
+    {
+        return $this->updateQueue;
     }
 }

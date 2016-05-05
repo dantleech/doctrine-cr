@@ -73,13 +73,16 @@ decorating that same `EventManager` - adding the possiblity to lookup any
 
 TODO:
 
-x Children collection
-x Map depth
+[x] Children collection
+[x] Map depth
+[x] Children collection + depth + others on persist.
+[x] Path\\Entry caching
+[x] Implicit move
+[ ] Explicit move
+[ ] Remove
+[ ] XSL Schema
+[ ] Generalize lookUpBy / lookupFor / getByUuid / etc.
+[ ] Rename CREvents to DcrEvents
+[ ] Rename CRSubscriber to DcrSubscriber
 
-- Explicit + Implicit Move, Delete (operations queue)
-
-- Children collection + depth + others on persist.
-- XSL schema
-
-- Path\\Entry caching
-- Child mapping
+[ ] Metadata cache
