@@ -16,13 +16,8 @@ class CreateOperation implements OperationInterface
         $this->entry = $entry;
     }
 
-    public function commit(StorageInterface $storage, EntryRegistry $entryRegistry)
+    public function commit(StorageInterface $storage)
     {
         $storage->commit($this->entry);
-    }
-
-    public function rollback(StorageInterface $storage, EntryRegistry $entryRegistry)
-    {
-        $storage->remove($this->entry->getUuid());
     }
 }

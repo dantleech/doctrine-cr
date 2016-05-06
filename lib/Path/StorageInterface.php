@@ -17,4 +17,10 @@ interface StorageInterface
     public function remove($uuid);
 
     public function move($srcUuid, $destPath);
+
+    public function startTransaction();
+
+    public function commitTransaction();
+
+    public function rollbackTransaction();
 }

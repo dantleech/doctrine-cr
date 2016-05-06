@@ -17,13 +17,8 @@ class MoveOperation implements OperationInterface
         $this->destPath = $destPath;
     }
 
-    public function commit(StorageInterface $storage, EntryRegistry $entryRegistry)
+    public function commit(StorageInterface $storage)
     {
         $storage->move($this->srcUuid, $this->destPath);
-    }
-
-    public function rollback(StorageInterface $storage, EntryRegistry $entryRegistry)
-    {
-        $storage->move($this->destPath, $this->srcUuid);
     }
 }

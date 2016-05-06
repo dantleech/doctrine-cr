@@ -129,6 +129,18 @@ class DbalStorageTest extends BaseTestCase
         ];
     }
 
+    /**
+     * It should start, commit and rollback transactions.
+     */
+    public function testRollbackTransaction()
+    {
+        $this->getStorage()->startTransaction();
+        $this->createPages([ 'page one' => [] ]);
+        $this->assertEntries([[ 'path' => '/page one' ]], 'Pages not yet created');
+        $this->getStorage()->rollbackTransaction();
+        $this->assertEntries([], 'Transaction rolledback');
+    }
+
     private function assertEntries(array $entryAssertions, $description)
     {
         $stmt = $this->getDbalConnection()->query('SELECT path, depth FROM doctrine_content_repository_paths ORDER by depth');

@@ -15,21 +15,20 @@ class PathManager
 {
     private $storage;
     private $operationQueue;
-    private $rollbackQueue;
     private $uuidFactory;
     private $entryRegistry;
 
     public function __construct(
         StorageInterface $storage, 
         UuidFactory $uuidFactory = null,
-        EntryRegistry $entryRegistry = null
+        EntryRegistry $entryRegistry = null,
+        \SplQueue $operationQueue = null
     )
     {
         $this->storage = $storage;
         $this->uuidFactory = $uuidFactory ?: new UuidFactory();
         $this->entryRegistry = $entryRegistry ?: new EntryRegistry();
-        $this->operationQueue = new \SplQueue();
-        $this->rollbackQueue = new \SplQueue();
+        $this->operationQueue = $operationQueue ?: new \SplQueue();
     }
 
     public function getByPath($path)
@@ -107,24 +106,26 @@ class PathManager
 
     public function flush()
     {
-        // TODO: Only support real transactions ?
+        $this->storage->startTransaction();
+
+        $executedOperations = new \SplQueue();
         try {
             while (false === $this->operationQueue->isEmpty()) {
                 $operation = $this->operationQueue->dequeue();
-                $operation->commit($this->storage, $this->entryRegistry);
-                $this->rollbackQueue[] = $operation;
-            }
-        } catch (\Exception $e) {
-            // TODO: Test rollback
-            while (false === $this->rollbackQueue->isEmpty()) {
-                $operation = $this->rollbackQueue->dequeue();
-                $operation->rollback($this->storage, $this->entryRegistry);
+                $operation->commit($this->storage);
+                $executedOperations->enqueue($operation);
             }
 
-            throw new \RuntimeException(
-                'Could not flush the path manager',
-                null, $e
-            );
+            $this->storage->commitTransaction();
+        } catch (\Exception $e) {
+            $this->storage->rollbackTransaction();
+
+            // add the executed operations back to the operation queue..
+            foreach ($executedOperations as $executedOperation) {
+                $this->operationQueue->enqueue($executedOperation);
+            }
+
+            throw $e;
         }
     }
 }

@@ -15,15 +15,8 @@ class RemoveOperation implements OperationInterface
         $this->uuid = $uuid;
     }
 
-    public function commit(StorageInterface $storage, EntryRegistry $entryRegistry)
+    public function commit(StorageInterface $storage)
     {
         $storage->remove($this->uuid);
-    }
-
-    public function rollback(StorageInterface $storage, EntryRegistry $entryRegistry)
-    {
-        throw new \BadMethodCallException(
-            'Rollback not supported for remove'
-        );
     }
 }

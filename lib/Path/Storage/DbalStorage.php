@@ -158,6 +158,30 @@ class DbalStorage implements StorageInterface
         ]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function startTransaction()
+    {
+        $this->connection->beginTransaction();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function commitTransaction()
+    {
+        $this->connection->commit();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rollbackTransaction()
+    {
+        $this->connection->rollBack();
+    }
+
     private function lookup($columnName, $identifier)
     {
         $sql = sprintf(
