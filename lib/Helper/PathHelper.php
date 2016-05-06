@@ -31,12 +31,12 @@ class PathHelper
     /**
      * Return true if $candidatePath is the same as, or a descendant of, $selfPath.
      *
-     * @param string $selfPath
      * @param string $candidatePath
+     * @param string $selfPath
      *
      * @return bool
      */
-    public static function isSelfOrDescendant($selfPath, $candidatePath)
+    public static function isSelfOrDescendant($candidatePath, $selfPath)
     {
         return $candidatePath === $selfPath || 0 === strpos($candidatePath, $selfPath . '/');
     }

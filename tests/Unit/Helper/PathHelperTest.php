@@ -127,7 +127,7 @@ class PathHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsSelfOrDescendant($self, $candidate, $expected)
     {
-        $result = PathHelper::isSelfOrDescendant($self, $candidate);
+        $result = PathHelper::isSelfOrDescendant($candidate, $self);
         $this->assertEquals($expected, $result);
     }
 

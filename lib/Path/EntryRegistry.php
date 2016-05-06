@@ -48,7 +48,7 @@ class EntryRegistry
     {
         $srcEntry = $this->getByUuid($srcUuid);
 
-        if (PathHelper::isSelfOrDescendant($srcEntry->getPath(), $destPath)) {
+        if (PathHelper::isSelfOrDescendant($destPath, $srcEntry->getPath())) {
             throw new \InvalidArgumentException(sprintf(
                 'Error moving entry from "%s" to "%s", cannot move a node onto itself or one of its descendants.',
                 $srcEntry->getPath(), $destPath
@@ -57,8 +57,8 @@ class EntryRegistry
 
         $srcPath = $srcEntry->getPath();
 
-        foreach ($this->entries as $uuid => $entry) {
-            if (false === PathHelper::isSelfOrDescendant($srcPath, $entry->getPath())) {
+        foreach ($this->entries as $entry) {
+            if (false === PathHelper::isSelfOrDescendant($entry->getPath(), $srcPath)) {
                continue;
             }
 
@@ -116,7 +116,7 @@ class EntryRegistry
         $uuids = $this->uuidsByPath;
 
         foreach ($uuids as $path => $uuid) {
-            if (false === PathHelper::isSelfOrDescendant($entry->getPath(), $path)) {
+            if (false === PathHelper::isSelfOrDescendant($path, $entry->getPath())) {
                 continue;
             }
 
