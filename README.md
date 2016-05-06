@@ -54,8 +54,8 @@ restrictions upon your domain model.
 Another tree extension?
 -----------------------
 
-This extension is differnet in that enables each node to be of a different
-object class and allows nodes to be refernced by a single UUID regardless of
+This extension is different in that enables each node to be of a different
+object class and allows nodes to be referenced by a single UUID regardless of
 which table they reside in.
 
 Configuration
@@ -84,9 +84,7 @@ $dcrSubscriber =  new DcrSubscriber(
     $ormEntityManager, // should do a minor refactor to remove this dep
 );
 
-$ormEntityManager->getEventManager()->addEventSubscriber(
-    $container['dcr.subscriber']
-);
+$ormEntityManager->getEventManager()->addEventSubscriber($dcrSubscriber);
 
 // create our new hierarchically aware entity manager
 $wrappedEntityManager = new ObjectManager($pathManager, $ormEntityManager);
@@ -110,17 +108,3 @@ DoctrineCR then includes an event subscriber which will listen to load and
 persist events sent from the standard Doctrine `EntityManager` in addition to
 decorating that same `EventManager` - adding the possiblity to lookup any
 (managed) Entity by UUID and perform tree specific operations such as moving.
-
-TODO
-----
-
-[ ] Only subscribe to DCR object manager events?
-[ ] PHPCR API
-[ ] XSL Schema
-[ ] Metadata cache
-[ ] ReferenceOne / ReferenceMany
-[ ] Referrers? (will likely need a new table)
-[ ] EntityManager does not need to be a dependency of the subscriber.
-[ ] Support mongo DB etc.
-[ ] Add a FK bound column for each managed hierarchical entity (instead of
-    having a "soft" link).
