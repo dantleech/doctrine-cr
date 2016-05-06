@@ -42,8 +42,8 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
         $pathEntry = new Entry('1234', '/path/to', 'ClassFqn');
         $this->registry->register($pathEntry);
 
-        $this->assertSame($pathEntry, $this->registry->getForUuid('1234'));
-        $this->assertSame($pathEntry, $this->registry->getForPath('/path/to'));
+        $this->assertSame($pathEntry, $this->registry->getByUuid('1234'));
+        $this->assertSame($pathEntry, $this->registry->getByPath('/path/to'));
     }
 
     /**
@@ -54,7 +54,7 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function testNonExistingUuid()
     {
-        $this->registry->getForUuid('1234');
+        $this->registry->getByUuid('1234');
     }
 
 
@@ -66,7 +66,7 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function testNonExistingPath()
     {
-        $this->registry->getForPath('1234');
+        $this->registry->getByPath('1234');
     }
 
     /**

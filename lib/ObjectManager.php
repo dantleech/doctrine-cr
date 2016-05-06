@@ -2,7 +2,6 @@
 
 namespace DTL\DoctrineCR;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Decorator\EntityManagerDecorator;
 use Doctrine\ORM\EntityManagerInterface;
 use DTL\DoctrineCR\Path\PathManagerInterface;

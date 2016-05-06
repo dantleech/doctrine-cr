@@ -35,7 +35,7 @@ class PathManager
     public function lookupByPath($path)
     {
         if ($this->entryRegistry->hasPath($path)) {
-            return $this->entryRegistry->getForPath($path);
+            return $this->entryRegistry->getByPath($path);
         }
 
         $entry = $this->storage->lookupByPath($path);
@@ -47,7 +47,7 @@ class PathManager
     public function lookupByUuid($uuid)
     {
         if ($this->entryRegistry->hasUuid($uuid)) {
-            return $this->entryRegistry->getForUuid($uuid);
+            return $this->entryRegistry->getByUuid($uuid);
         }
 
         $entry = $this->storage->lookupByUuid($uuid);

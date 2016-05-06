@@ -36,7 +36,7 @@ class PathHelper
      *
      * @return bool
      */
-    public function isSelfOrDescendant($selfPath, $candidatePath)
+    public static function isSelfOrDescendant($selfPath, $candidatePath)
     {
         return $candidatePath === $selfPath || 0 === strpos($candidatePath, $selfPath . '/');
     }

@@ -46,7 +46,7 @@ class EntryRegistry
 
     public function move($srcUuid, $destPath)
     {
-        $srcEntry = $this->getForUuid($srcUuid);
+        $srcEntry = $this->getByUuid($srcUuid);
 
         if (PathHelper::isSelfOrDescendant($srcEntry->getPath(), $destPath)) {
             throw new \InvalidArgumentException(sprintf(
@@ -81,7 +81,7 @@ class EntryRegistry
         return isset($this->uuidsByPath[$path]);
     }
 
-    public function getForPath($path)
+    public function getByPath($path)
     {
         if (!$this->hasPath($path)) {
             throw new RegistryException(sprintf(
@@ -98,7 +98,7 @@ class EntryRegistry
         return isset($this->entries[$uuid]);
     }
 
-    public function getForUuid($uuid)
+    public function getByUuid($uuid)
     {
         if (!$this->hasUuid($uuid)) {
             throw new RegistryException(sprintf(
@@ -112,7 +112,7 @@ class EntryRegistry
 
     public function remove($uuid)
     {
-        $entry = $this->getForUuid($uuid);
+        $entry = $this->getByUuid($uuid);
         $uuids = $this->uuidsByPath;
 
         foreach ($uuids as $path => $uuid) {
@@ -126,7 +126,7 @@ class EntryRegistry
 
     private function removeSingle($uuid)
     {
-        $entry = $this->getForUuid($uuid);
+        $entry = $this->getByUuid($uuid);
         unset($this->entries[$uuid]);
         unset($this->uuidsByPath[$entry->getPath()]);
     }
