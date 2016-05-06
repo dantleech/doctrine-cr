@@ -6,7 +6,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use DTL\DoctrineCR\Path\StorageInterface;
-use DTL\DoctrineCR\Events as CREvents;
+use DTL\DoctrineCR\Events as DcrEvents;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Metadata\MetadataFactory;
 use Doctrine\Common\Util\ClassUtils;
@@ -27,7 +27,6 @@ class DcrSubscriber implements EventSubscriber
     private $pathManager;
     private $metadataFactory;
     private $entityManager;
-    private $mapper;
 
     public function __construct(
         PathManager $pathManager, 
@@ -56,9 +55,9 @@ class DcrSubscriber implements EventSubscriber
     public function getSubscribedEvents()
     {
         return [
-            CREvents::prePersist,
-            CREvents::postPersist,
-            CREvents::postMove,
+            DcrEvents::prePersist,
+            DcrEvents::postPersist,
+            DcrEvents::postMove,
             Events::preRemove,
             Events::postLoad,
             // pre flush is always raised
