@@ -10,7 +10,7 @@ use DTL\DoctrineCR\NodeManager\Dbal;
 use DTL\DoctrineCR\Path\Storage\Dbal\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
 use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Article;
-use DTL\DoctrineCR\Subscriber\CRSubscriber;
+use DTL\DoctrineCR\Subscriber\DcrSubscriber;
 use DTL\DoctrineCR\Path\Storage\DbalStorage;
 use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Page;
 use Symfony\Component\Filesystem\Filesystem;

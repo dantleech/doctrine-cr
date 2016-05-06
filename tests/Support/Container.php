@@ -11,7 +11,7 @@ use DTL\DoctrineCR\NodeManager\Dbal;
 use DTL\DoctrineCR\Path\Storage\Dbal\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
 use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Article;
-use DTL\DoctrineCR\Subscriber\CRSubscriber;
+use DTL\DoctrineCR\Subscriber\DcrSubscriber;
 use DTL\DoctrineCR\Path\Storage\DbalStorage;
 use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Page;
 use Symfony\Component\Filesystem\Filesystem;
@@ -93,7 +93,7 @@ class Container extends BaseContainer
         };
 
         $this['dcr.subscriber'] = function (Container $container) {
-            return new CRSubscriber($container['dcr.path.manager'], $container['dcr.metadata.factory'], $container['orm.entity_manager']);
+            return new DcrSubscriber($container['dcr.path.manager'], $container['dcr.metadata.factory'], $container['orm.entity_manager']);
         };
 
         $this['dcr.object_manager'] = function (Container $container) {

@@ -22,7 +22,7 @@ use Doctrine\ORM\Event\PreFlushEventArgs;
 use DTL\DoctrineCR\Mapping\Persister;
 use DTL\DoctrineCR\Event\MoveEvent;
 
-class CRSubscriber implements EventSubscriber
+class DcrSubscriber implements EventSubscriber
 {
     private $pathManager;
     private $metadataFactory;
