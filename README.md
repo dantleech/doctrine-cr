@@ -51,12 +51,52 @@ Note that the above methods are not part of an interface, but are using mapped
 properties - the DoctrineCR, like Doctrine itself, does not impose any
 restrictions upon your domain model.
 
-At a glance
------------
+Another tree extension?
+-----------------------
 
-- Hierarchical, tree, organization of Doctrine Entities;
-- Global UUID (uuid4), class-less `->find`;
-- Order preservation on path operations;
+This extension is differnet in that enables each node to be of a different
+object class and allows nodes to be refernced by a single UUID regardless of
+which table they reside in.
+
+Configuration
+-------------
+
+```php
+use Metadata\MetadataFactory;
+use DTL\DoctrineCR\Metadata\Driver\XmlDriver;
+use DTL\DoctrineCR\Metadata\Locator\DoctrineLocator;
+use DTL\DoctrineCR\Path\Storage\DbalStorage;
+use DTL\DoctrineCR\Path\PathManager;
+
+$metadataFactory = new MetadataFactory(
+    new XmlDriver(
+        new DoctrineLocator($container['orm.file_locator'])
+    )
+);
+        };
+
+$pathStorage =  new DbalStorage($container['dbal.connection']);
+$pathManager = new PathManager($pathStorage);
+
+$dcrSubscriber =  new DcrSubscriber(
+    $pathManager,
+    $metadataFactory,
+    $ormEntityManager, // should do a minor refactor to remove this dep
+);
+
+$ormEntityManager->getEventManager()->addEventSubscriber(
+    $container['dcr.subscriber']
+);
+
+// create our new hierarchically aware entity manager
+$wrappedEntityManager = new ObjectManager($pathManager, $ormEntityManager);
+
+$wrappedEntityManager->find(null, '/foo/bar');
+$wrappedEntityManager->move('/foobar', '/barfoo');
+$wrappedEntityManager->persist($document);
+$wrappedEntityManager->remove('/foobar');
+// etc.
+```
 
 How does it work?
 -----------------
@@ -71,21 +111,16 @@ persist events sent from the standard Doctrine `EntityManager` in addition to
 decorating that same `EventManager` - adding the possiblity to lookup any
 (managed) Entity by UUID and perform tree specific operations such as moving.
 
-TODO:
+TODO
+----
 
-[x] Children collection
-[x] Map depth
-[x] Children collection + depth + others on persist.
-[x] Path\\Entry caching
-[x] Implicit move
-[x] Explicit move
-[x] Remove
+[ ] Only subscribe to DCR object manager events?
+[ ] PHPCR API
 [ ] XSL Schema
-[ ] Generalize lookUpBy / lookupFor / getByUuid / etc.
-[ ] Rename CREvents to DcrEvents
-[ ] Rename CRSubscriber to DcrSubscriber
-[ ] Failed transaction (move, remove): restore original state or retain
-    currently invalid state?
-[ ] Reverse argument order of PathHelper::isSelfOrDescendant
-
 [ ] Metadata cache
+[ ] ReferenceOne / ReferenceMany
+[ ] Referrers? (will likely need a new table)
+[ ] EntityManager does not need to be a dependency of the subscriber.
+[ ] Support mongo DB etc.
+[ ] Add a FK bound column for each managed hierarchical entity (instead of
+    having a "soft" link).
