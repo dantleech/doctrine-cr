@@ -28,9 +28,9 @@ class ObjectManager extends EntityManagerDecorator
     public function find($entityName, $identifier, $lockMode = null, $lockVersion = null)
     {
         if (UuidHelper::isUuid($identifier)) {
-            $entry = $this->pathManager->lookupByUuid($identifier);
+            $entry = $this->pathManager->getByUuid($identifier);
         } else {
-            $entry = $this->pathManager->lookupByPath($identifier);
+            $entry = $this->pathManager->getByPath($identifier);
         }
 
         return $this->wrapped->find(
@@ -53,7 +53,7 @@ class ObjectManager extends EntityManagerDecorator
         $srcUuid = $srcIdentifier;
 
         if (false === UuidHelper::isUuid($srcIdentifier)) {
-            $srcUuid = $this->pathManager->lookupByPath($srcIdentifier)->getUuid();
+            $srcUuid = $this->pathManager->getByPath($srcIdentifier)->getUuid();
         }
 
         $this->pathManager->move($srcUuid, $destPath);

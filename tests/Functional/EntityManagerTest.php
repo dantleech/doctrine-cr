@@ -165,7 +165,7 @@ class EntityManagerTest extends BaseTestCase
         $this->getEntityManager()->move($page3->getPath(), $page2->getPath() . '/BarBar');
         $this->assertEquals('/Foobar/Barfoo/BarBar', $page3->getPath());
 
-        $persistedEntry = $this->getStorage()->lookupByUuid($page3->getUuid());
+        $persistedEntry = $this->getStorage()->getByUuid($page3->getUuid());
         $this->assertEquals(
             '/BarBar', 
             $persistedEntry->getPath(),
@@ -174,7 +174,7 @@ class EntityManagerTest extends BaseTestCase
 
         $this->getEntityManager()->flush();
 
-        $persistedEntry = $this->getStorage()->lookupByUuid($page3->getUuid());
+        $persistedEntry = $this->getStorage()->getByUuid($page3->getUuid());
         $this->assertEquals(
             '/Foobar/Barfoo/BarBar', 
             $persistedEntry->getPath(),
@@ -195,13 +195,13 @@ class EntityManagerTest extends BaseTestCase
         $this->getEntityManager()->flush();
 
         try {
-            $this->getStorage()->lookupByUuid($page1->getUuid());
+            $this->getStorage()->getByUuid($page1->getUuid());
             $this->fail('UUID still exists after remove');
         } catch (NotFoundException $e) {
         }
 
         try {
-            $this->getStorage()->lookupByUuid($page2->getUuid());
+            $this->getStorage()->getByUuid($page2->getUuid());
             $this->fail('UUID of sub-node still exists after remove');
         } catch (NotFoundException $e) {
         }

@@ -32,25 +32,25 @@ class PathManager
         $this->rollbackQueue = new \SplQueue();
     }
 
-    public function lookupByPath($path)
+    public function getByPath($path)
     {
         if ($this->entryRegistry->hasPath($path)) {
             return $this->entryRegistry->getByPath($path);
         }
 
-        $entry = $this->storage->lookupByPath($path);
+        $entry = $this->storage->getByPath($path);
         $this->entryRegistry->register($entry);
 
         return $entry;
     }
 
-    public function lookupByUuid($uuid)
+    public function getByUuid($uuid)
     {
         if ($this->entryRegistry->hasUuid($uuid)) {
             return $this->entryRegistry->getByUuid($uuid);
         }
 
-        $entry = $this->storage->lookupByUuid($uuid);
+        $entry = $this->storage->getByUuid($uuid);
         $this->entryRegistry->register($entry);
 
         return $entry;

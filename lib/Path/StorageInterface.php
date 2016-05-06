@@ -6,9 +6,9 @@ use DTL\DoctrineCR\Path\Entry;
 
 interface StorageInterface
 {
-    public function lookupByPath($path);
+    public function getByPath($path);
 
-    public function lookupByUuid($uuid);
+    public function getByUuid($uuid);
 
     public function getChildren($path);
 

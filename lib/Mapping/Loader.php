@@ -32,7 +32,7 @@ class Loader
         $crMetadata = $this->metadataFactory->getMetadataForClass(ClassUtils::getRealClass(get_class($object)));
 
         // TODO: Only do this if we need it.
-        $pathEntry = $this->pathManager->lookupByUuid(
+        $pathEntry = $this->pathManager->getByUuid(
             $crMetadata->getUuidValue($object)
         );
 
@@ -57,7 +57,7 @@ class Loader
 
             // the parent path can be null if it is the root node
             if ($parentPath !== '/') {
-                $parentEntry = $this->pathManager->lookupByPath($parentPath);
+                $parentEntry = $this->pathManager->getByPath($parentPath);
                 $parentCrMetadata = $this->metadataFactory->getMetadataForClass($parentEntry->getClassFqn());
                 $parent = $this->entityManager->getReference(
                     $parentEntry->getClassFqn(),

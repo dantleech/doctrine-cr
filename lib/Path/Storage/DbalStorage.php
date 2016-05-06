@@ -26,7 +26,7 @@ class DbalStorage implements StorageInterface
     /**
      * {@inheritdoc}
      */
-    public function lookupByPath($path)
+    public function getByPath($path)
     {
         $entry = $this->lookup('path', $path);
 
@@ -40,7 +40,7 @@ class DbalStorage implements StorageInterface
     /**
      * {@inheritdoc}
      */
-    public function lookupByUuid($uuid)
+    public function getByUuid($uuid)
     {
         $entry = $this->lookup('uuid', $uuid);
 
@@ -56,7 +56,7 @@ class DbalStorage implements StorageInterface
      */
     public function getChildren($uuid)
     {
-        $entry = $this->lookupByUuid($uuid);
+        $entry = $this->getByUuid($uuid);
         $path = $entry->getPath();
         $pathDepth = PathHelper::getDepth($path);
 
@@ -85,7 +85,7 @@ class DbalStorage implements StorageInterface
     public function commit(Entry $entry)
     {
         try {
-            $existingEntry = $this->lookupByPath($entry->getPath());
+            $existingEntry = $this->getByPath($entry->getPath());
             throw new PathAlreadyRegisteredException(
                 $entry,
                 $existingEntry
@@ -114,7 +114,7 @@ class DbalStorage implements StorageInterface
      */
     public function remove($uuid)
     {
-        $entry = $this->lookupByUuid($uuid);
+        $entry = $this->getByUuid($uuid);
 
         $sql = sprintf(
             'DELETE FROM %s WHERE path LIKE :match OR uuid = :uuid',
@@ -133,7 +133,7 @@ class DbalStorage implements StorageInterface
      */
     public function move($uuid, $destPath)
     {
-        $entry = $this->lookupByUuid($uuid);
+        $entry = $this->getByUuid($uuid);
         $platform = $this->connection->getDatabasePlatform();
 
         $sql = sprintf(

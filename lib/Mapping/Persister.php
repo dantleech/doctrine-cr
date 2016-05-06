@@ -35,7 +35,7 @@ class Persister
             $parent = $crMetadata->getPropertyValue($object, $crMetadata->getParentProperty());
 
             if ($parent) {
-                $parentEntry = $this->pathManager->lookupByUuid(
+                $parentEntry = $this->pathManager->getByUuid(
                     $crMetadata->getUuidValue($parent)
                 );
                 $parentPath = $parentEntry->getPath();
@@ -55,7 +55,7 @@ class Persister
             return;
         }
 
-        $pathEntry = $this->pathManager->lookupByUuid($uuid);
+        $pathEntry = $this->pathManager->getByUuid($uuid);
 
         if ($path !== $pathEntry->getPath()) {
             $this->pathManager->move($uuid, $path);
