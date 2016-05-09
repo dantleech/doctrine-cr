@@ -1,16 +1,16 @@
 <?php
 
-namespace DTL\DoctrineCR\Path\Storage;
+namespace DoctrineCr\Path\Storage;
 
 use Doctrine\DBAL\Connection;
 use Ramsey\Uuid\UuidFactory;
-use DTL\DoctrineCR\Path\StorageInterface;
-use DTL\DoctrineCR\Path\Storage\Dbal\Schema;
-use DTL\DoctrineCR\Path\Entry;
-use DTL\DoctrineCR\Path\Exception\PathNotFoundException;
-use DTL\DoctrineCR\Path\Exception\PathAlreadyRegisteredException;
-use DTL\DoctrineCR\Path\Exception\UuidNotFoundException;
-use DTL\DoctrineCR\Helper\PathHelper;
+use DoctrineCr\Path\StorageInterface;
+use DoctrineCr\Path\Storage\Dbal\Schema;
+use DoctrineCr\Path\Entry;
+use DoctrineCr\Path\Exception\PathNotFoundException;
+use DoctrineCr\Path\Exception\PathAlreadyRegisteredException;
+use DoctrineCr\Path\Exception\UuidNotFoundException;
+use DoctrineCr\Helper\PathHelper;
 
 class DbalStorage implements StorageInterface
 {

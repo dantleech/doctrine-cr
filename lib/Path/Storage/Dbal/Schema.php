@@ -1,6 +1,6 @@
 <?php
 
-namespace DTL\DoctrineCR\Path\Storage\Dbal;
+namespace DoctrineCr\Path\Storage\Dbal;
 
 use Doctrine\DBAL\Schema\Schema as BaseSchema;
 

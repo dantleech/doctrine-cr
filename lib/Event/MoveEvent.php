@@ -1,6 +1,6 @@
 <?php
 
-namespace DTL\DoctrineCR\Event;
+namespace DoctrineCr\Event;
 
 use Doctrine\Common\EventArgs;
 use Doctrine\Common\Persistence\ObjectManager;

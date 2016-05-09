@@ -1,8 +1,8 @@
 <?php
 
-namespace DTL\DoctrineCR\Metadata\Mapping;
+namespace DoctrineCr\Metadata\Mapping;
 
-use DTL\DoctrineCR\Metadata\AbstractMapping;
+use DoctrineCr\Metadata\AbstractMapping;
 
 class ChildrenMapping extends AbstractMapping
 {

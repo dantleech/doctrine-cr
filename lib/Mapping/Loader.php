@@ -1,14 +1,14 @@
 <?php
 
-namespace DTL\DoctrineCR\Mapping;
+namespace DoctrineCr\Mapping;
 
-use DTL\DoctrineCR\Path\StorageInterface;
+use DoctrineCr\Path\StorageInterface;
 use Metadata\MetadataFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
-use DTL\DoctrineCR\Helper\PathHelper;
-use DTL\DoctrineCR\Collection\ChildrenCollection;
-use DTL\DoctrineCR\Path\PathManager;
+use DoctrineCr\Helper\PathHelper;
+use DoctrineCr\Collection\ChildrenCollection;
+use DoctrineCr\Path\PathManager;
 
 class Loader
 {

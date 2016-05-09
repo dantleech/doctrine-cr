@@ -1,10 +1,10 @@
 <?php
 
-namespace DTL\DoctrineCR\Metadata;
+namespace DoctrineCr\Metadata;
 
 use Metadata\ClassMetadata as BaseClassMetadata;
 use Metadata\MergeableInterface;
-use DTL\DoctrineCR\Metadata\Mapping\ChildrenMapping;
+use DoctrineCr\Metadata\Mapping\ChildrenMapping;
 
 class ClassMetadata extends BaseClassMetadata implements MergeableInterface
 {

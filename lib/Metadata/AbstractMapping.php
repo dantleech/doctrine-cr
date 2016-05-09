@@ -1,6 +1,6 @@
 <?php
 
-namespace DTL\DoctrineCR\Metadata;
+namespace DoctrineCr\Metadata;
 
 abstract class AbstractMapping
 {

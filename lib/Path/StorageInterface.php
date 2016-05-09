@@ -1,8 +1,8 @@
 <?php
 
-namespace DTL\DoctrineCR\Path;
+namespace DoctrineCr\Path;
 
-use DTL\DoctrineCR\Path\Entry;
+use DoctrineCr\Path\Entry;
 
 interface StorageInterface
 {

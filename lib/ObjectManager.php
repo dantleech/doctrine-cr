@@ -1,15 +1,15 @@
 <?php
 
-namespace DTL\DoctrineCR;
+namespace DoctrineCr;
 
 use Doctrine\ORM\Decorator\EntityManagerDecorator;
 use Doctrine\ORM\EntityManagerInterface;
-use DTL\DoctrineCR\Path\PathManagerInterface;
-use DTL\DoctrineCR\Helper\UuidHelper;
-use DTL\DoctrineCR\Path\PathManager;
-use DTL\DoctrineCR\Events as DcrEvents;
+use DoctrineCr\Path\PathManagerInterface;
+use DoctrineCr\Helper\UuidHelper;
+use DoctrineCr\Path\PathManager;
+use DoctrineCr\Events as DcrEvents;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use DTL\DoctrineCR\Event\MoveEvent;
+use DoctrineCr\Event\MoveEvent;
 
 
 class ObjectManager extends EntityManagerDecorator

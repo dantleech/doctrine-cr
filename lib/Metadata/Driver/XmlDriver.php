@@ -1,14 +1,14 @@
 <?php
 
-namespace DTL\DoctrineCR\Metadata\Driver;
+namespace DoctrineCr\Metadata\Driver;
 
 use Metadata\Driver\AbstractFileDriver;
 use Metadata\Driver\DriverInterface;
 use Metadata\Driver\FileLocatorInterface;
 use PhpBench\Dom\Document;
-use DTL\DoctrineCR\Metadata\ClassMetadata;
-use DTL\DoctrineCR\Metadata\PropertyMetadata;
-use DTL\DoctrineCR\Metadata\Mapping\ChildrenMapping;
+use DoctrineCr\Metadata\ClassMetadata;
+use DoctrineCr\Metadata\PropertyMetadata;
+use DoctrineCr\Metadata\Mapping\ChildrenMapping;
 
 class XmlDriver extends AbstractFileDriver implements DriverInterface
 {

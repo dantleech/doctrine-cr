@@ -1,14 +1,14 @@
 <?php
 
-namespace DTL\DoctrineCR\Collection;
+namespace DoctrineCr\Collection;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\AbstractLazyCollection;
 use Metadata\MetadataFactory;
-use DTL\DoctrineCR\Path\Entry;
+use DoctrineCr\Path\Entry;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-use DTL\DoctrineCR\Path\PathManager;
+use DoctrineCr\Path\PathManager;
 
 class ChildrenCollection extends AbstractLazyCollection
 {
@@ -38,8 +38,6 @@ class ChildrenCollection extends AbstractLazyCollection
 
         $children = [];
         foreach ($childEntries as $childEntry) {
-            $childMetadata = $this->metadataFactory->getMetadataForClass($childEntry->getClassFqn());
-
             $children[] = $this->entityManager->getReference(
                 $childEntry->getClassFqn(),
                 $childEntry->getUuid()

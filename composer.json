@@ -21,12 +21,12 @@
     },
     "autoload": {
         "psr-4": {
-            "DTL\\DoctrineCR\\": "lib/"
+            "DoctrineCr\\": "lib/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "DTL\\DoctrineCR\\Tests\\": "tests/"
+            "DoctrineCr\\Tests\\": "tests/"
         }
     },
     "extra": {

@@ -1,8 +1,8 @@
 <?php
 
-namespace DTL\DoctrineCR\Tests\Unit\Path;
+namespace DoctrineCr\Tests\Unit\Path;
 
-use DTL\DoctrineCR\Path\Entry;
+use DoctrineCr\Path\Entry;
 
 class EntryTest extends \PHPUnit_Framework_TestCase
 {

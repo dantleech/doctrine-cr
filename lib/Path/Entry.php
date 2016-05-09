@@ -1,8 +1,8 @@
 <?php
 
-namespace DTL\DoctrineCR\Path;
+namespace DoctrineCr\Path;
 
-use DTL\DoctrineCR\Helper\PathHelper;
+use DoctrineCr\Helper\PathHelper;
 
 class Entry
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace DTL\DoctrineCR\Mapping;
+namespace DoctrineCr\Mapping;
 
 use Metadata\MetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadata;

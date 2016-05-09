@@ -1,9 +1,9 @@
 <?php
 
-namespace DTL\DoctrineCR\Tests\Unit\Metadata\Driver;
+namespace DoctrineCr\Tests\Unit\Metadata\Driver;
 
 use Metadata\Driver\FileLocatorInterface;
-use DTL\DoctrineCR\Metadata\Driver\XmlDriver;
+use DoctrineCr\Metadata\Driver\XmlDriver;
 
 class XmlDriverTest extends \PHPUnit_Framework_TestCase
 {

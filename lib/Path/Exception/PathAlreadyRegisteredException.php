@@ -1,8 +1,8 @@
 <?php
 
-namespace DTL\DoctrineCR\Path\Exception;
+namespace DoctrineCr\Path\Exception;
 
-use DTL\DoctrineCR\Path\Entry;
+use DoctrineCr\Path\Entry;
 
 class PathAlreadyRegisteredException extends \RuntimeException
 {

@@ -1,15 +1,15 @@
 <?php
 
-namespace DTL\DoctrineCR\Path;
+namespace DoctrineCr\Path;
 
-use DTL\DoctrineCR\Path\StorageInterface;
+use DoctrineCr\Path\StorageInterface;
 use Ramsey\Uuid\UuidFactory;
-use DTL\DoctrineCR\Helper\PathHelper;
-use DTL\DoctrineCR\Operation\Operation\CreateOperation;
-use DTL\DoctrineCR\Operation\Operation\MoveOperation;
-use DTL\DoctrineCR\Path\Entry;
-use DTL\DoctrineCR\Path\EntryRegistry;
-use DTL\DoctrineCR\Operation\Operation\RemoveOperation;
+use DoctrineCr\Helper\PathHelper;
+use DoctrineCr\Operation\Operation\CreateOperation;
+use DoctrineCr\Operation\Operation\MoveOperation;
+use DoctrineCr\Path\Entry;
+use DoctrineCr\Path\EntryRegistry;
+use DoctrineCr\Operation\Operation\RemoveOperation;
 
 class PathManager
 {

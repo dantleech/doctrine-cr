@@ -1,9 +1,9 @@
 <?php
 
-namespace DTL\DoctrineCR\Tests\Unit\Path;
+namespace DoctrineCr\Tests\Unit\Path;
 
-use DTL\DoctrineCR\Path\EntryRegistry;
-use DTL\DoctrineCR\Path\Entry;
+use DoctrineCr\Path\EntryRegistry;
+use DoctrineCr\Path\Entry;
 
 class EntryRegistryTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,7 +49,7 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
     /**
      * It should throw an exception if a non-existing UUID is given.
      *
-     * @expectedException \DTL\DoctrineCR\Path\Exception\RegistryException
+     * @expectedException \DoctrineCr\Path\Exception\RegistryException
      * @expectedExceptionMessage UUID "1234" is not registered, there are 0 registered entries.
      */
     public function testNonExistingUuid()
@@ -61,7 +61,7 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
     /**
      * It should throw an exception if a non-existing PATH is given.
      *
-     * @expectedException \DTL\DoctrineCR\Path\Exception\RegistryException
+     * @expectedException \DoctrineCr\Path\Exception\RegistryException
      * @expectedExceptionMessage Path "1234" is not registered, there are 0 registered entries.
      */
     public function testNonExistingPath()
@@ -72,7 +72,7 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
     /**
      * It should throw an exception if a path is already registered..
      *
-     * @expectedException \DTL\DoctrineCR\Path\Exception\RegistryException
+     * @expectedException \DoctrineCr\Path\Exception\RegistryException
      * @expectedExceptionMessage Entry for path "/path/to" has already been registered to object with UUID "4321" (ClassFqn)
      */
     public function testRegisterAlreadyExistingPath()
@@ -86,7 +86,7 @@ class EntryRegistryTest extends \PHPUnit_Framework_TestCase
     /**
      * It should throw an exception if a UUID is already registered..
      *
-     * @expectedException \DTL\DoctrineCR\Path\Exception\RegistryException
+     * @expectedException \DoctrineCr\Path\Exception\RegistryException
      * @expectedExceptionMessage Entry for UUID "1234" has already been registered to object at path "/path/to/1" (ClassFqn)
      */
     public function testRegisterAlreadyExistingUuid()

@@ -1,10 +1,10 @@
 <?php
 
-namespace DTL\DoctrineCR\Operation\Operation;
+namespace DoctrineCr\Operation\Operation;
 
-use DTL\DoctrineCR\Operation\OperationInterface;
-use DTL\DoctrineCR\Path\StorageInterface;
-use DTL\DoctrineCR\Path\EntryRegistry;
+use DoctrineCr\Operation\OperationInterface;
+use DoctrineCr\Path\StorageInterface;
+use DoctrineCr\Path\EntryRegistry;
 
 class MoveOperation implements OperationInterface
 {

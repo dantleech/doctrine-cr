@@ -1,6 +1,6 @@
 <?php
 
-namespace DTL\DoctrineCR\Metadata\Locator;
+namespace DoctrineCr\Metadata\Locator;
 
 use Metadata\Driver\FileLocatorInterface;
 use Doctrine\Common\Persistence\Mapping\Driver\FileLocator;

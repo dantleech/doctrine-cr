@@ -1,11 +1,11 @@
 <?php
 
-namespace DTL\DoctrineCR\Tests\Functional;
+namespace DoctrineCr\Tests\Functional;
 
-use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Page;
-use DTL\DoctrineCR\Path\Exception\PathAlreadyRegisteredException;
-use DTL\DoctrineCR\Path\Exception\RegistryException;
-use DTL\DoctrineCR\Path\Exception\NotFoundException;
+use DoctrineCr\Tests\Functional\Resources\Entity\Page;
+use DoctrineCr\Path\Exception\PathAlreadyRegisteredException;
+use DoctrineCr\Path\Exception\RegistryException;
+use DoctrineCr\Path\Exception\NotFoundException;
 
 class EntityManagerTest extends BaseTestCase
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace DTL\DoctrineCR\Operation;
+namespace DoctrineCr\Operation;
 
-use DTL\DoctrineCR\Path\StorageInterface;
-use DTL\DoctrineCR\Path\EntryRegistry;
+use DoctrineCr\Path\StorageInterface;
+use DoctrineCr\Path\EntryRegistry;
 
 interface OperationInterface
 {

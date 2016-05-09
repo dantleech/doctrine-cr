@@ -2,7 +2,7 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
     xmlns:cr="http://github.com/dantleech/doctrine-cr">
 
-    <entity name="DTL\DoctrineCR\Tests\Functional\Resources\Entity\Page">
+    <entity name="DoctrineCr\Tests\Functional\Resources\Entity\Page">
         <field name="contents" type="string" nullable="true"/>
 
         <cr:managed/>

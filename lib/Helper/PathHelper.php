@@ -1,6 +1,6 @@
 <?php
 
-namespace DTL\DoctrineCR\Helper;
+namespace DoctrineCr\Helper;
 
 
 

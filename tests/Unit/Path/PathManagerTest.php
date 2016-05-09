@@ -1,10 +1,10 @@
 <?php
 
-namespace DTL\DoctrineCR\Tests\Unit\Path;
+namespace DoctrineCr\Tests\Unit\Path;
 
-use DTL\DoctrineCR\Path\PathManager;
-use DTL\DoctrineCR\Path\StorageInterface;
-use DTL\DoctrineCR\Operation\OperationInterface;
+use DoctrineCr\Path\PathManager;
+use DoctrineCr\Path\StorageInterface;
+use DoctrineCr\Operation\OperationInterface;
 
 class PathManagerTest extends \PHPUnit_Framework_TestCase
 {

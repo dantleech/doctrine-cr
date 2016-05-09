@@ -1,26 +1,26 @@
 <?php
 
-namespace DTL\DoctrineCR\Subscriber;
+namespace DoctrineCr\Subscriber;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use DTL\DoctrineCR\Path\StorageInterface;
-use DTL\DoctrineCR\Events as DcrEvents;
+use DoctrineCr\Path\StorageInterface;
+use DoctrineCr\Events as DcrEvents;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Metadata\MetadataFactory;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-use DTL\DoctrineCR\Helper\PathHelper;
-use DTL\DoctrineCR\Path\Exception\PathNotFoundException;
-use DTL\DoctrineCR\Collection\ChildrenCollection;
-use DTL\DoctrineCR\Mapping\Mapper;
-use DTL\DoctrineCR\Mapping\MetadataLoader;
-use DTL\DoctrineCR\Mapping\Loader;
-use DTL\DoctrineCR\Path\PathManager;
+use DoctrineCr\Helper\PathHelper;
+use DoctrineCr\Path\Exception\PathNotFoundException;
+use DoctrineCr\Collection\ChildrenCollection;
+use DoctrineCr\Mapping\Mapper;
+use DoctrineCr\Mapping\MetadataLoader;
+use DoctrineCr\Mapping\Loader;
+use DoctrineCr\Path\PathManager;
 use Doctrine\ORM\Event\PreFlushEventArgs;
-use DTL\DoctrineCR\Mapping\Persister;
-use DTL\DoctrineCR\Event\MoveEvent;
+use DoctrineCr\Mapping\Persister;
+use DoctrineCr\Event\MoveEvent;
 
 class DcrSubscriber implements EventSubscriber
 {

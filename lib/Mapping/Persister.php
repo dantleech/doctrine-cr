@@ -1,10 +1,10 @@
 <?php
 
-namespace DTL\DoctrineCR\Mapping;
+namespace DoctrineCr\Mapping;
 
-use DTL\DoctrineCR\Path\PathManager;
+use DoctrineCr\Path\PathManager;
 use Metadata\MetadataFactory;
-use DTL\DoctrineCR\Helper\PathHelper;
+use DoctrineCr\Helper\PathHelper;
 use Doctrine\Common\Util\ClassUtils;
 
 class Persister

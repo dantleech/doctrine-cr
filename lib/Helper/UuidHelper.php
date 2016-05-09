@@ -1,6 +1,6 @@
 <?php
 
-namespace DTL\DoctrineCR\Helper;
+namespace DoctrineCr\Helper;
 
 /**
  * Some (or all) of the methods in this class copied from the

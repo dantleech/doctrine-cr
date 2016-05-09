@@ -1,8 +1,8 @@
 <?php
 
-namespace DTL\DoctrineCR\Tests\Unit\Helper;
+namespace DoctrineCr\Tests\Unit\Helper;
 
-use DTL\DoctrineCR\Helper\PathHelper;
+use DoctrineCr\Helper\PathHelper;
 
 class PathHelperTest extends \PHPUnit_Framework_TestCase
 {

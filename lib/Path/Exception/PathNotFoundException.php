@@ -1,6 +1,6 @@
 <?php
 
-namespace DTL\DoctrineCR\Path\Exception;
+namespace DoctrineCr\Path\Exception;
 
 class PathNotFoundException extends \Exception
 {

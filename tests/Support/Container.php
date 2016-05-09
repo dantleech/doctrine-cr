@@ -1,28 +1,28 @@
 <?php
 
-namespace DTL\DoctrineCR\Tests\Support;
+namespace DoctrineCr\Tests\Support;
 
 use Pimple\Container as BaseContainer;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
-use DTL\DoctrineCR\ObjectManager;
-use DTL\DoctrineCR\NodeManager\Dbal;
-use DTL\DoctrineCR\Path\Storage\Dbal\Schema;
+use DoctrineCr\ObjectManager;
+use DoctrineCr\NodeManager\Dbal;
+use DoctrineCr\Path\Storage\Dbal\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
-use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Article;
-use DTL\DoctrineCR\Subscriber\DcrSubscriber;
-use DTL\DoctrineCR\Path\Storage\DbalStorage;
-use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Page;
+use DoctrineCr\Tests\Functional\Resources\Entity\Article;
+use DoctrineCr\Subscriber\DcrSubscriber;
+use DoctrineCr\Path\Storage\DbalStorage;
+use DoctrineCr\Tests\Functional\Resources\Entity\Page;
 use Symfony\Component\Filesystem\Filesystem;
 use Metadata\MetadataFactory;
 use Metadata\Driver\FileLocator;
 use Doctrine\Common\Persistence\Mapping\Driver\DefaultFileLocator;
-use DTL\DoctrineCR\Metadata\Locator\DoctrineLocator;
+use DoctrineCr\Metadata\Locator\DoctrineLocator;
 use Doctrine\ORM\Mapping\Driver\XmlDriver as DoctrineXmlDriver;
-use DTL\DoctrineCR\Metadata\Driver\XmlDriver;
-use DTL\DoctrineCR\Path\PathManager;
-use DTL\DoctrineCR\Tests\Support\Container;
+use DoctrineCr\Metadata\Driver\XmlDriver;
+use DoctrineCr\Path\PathManager;
+use DoctrineCr\Tests\Support\Container;
 
 class Container extends BaseContainer
 {

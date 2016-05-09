@@ -1,9 +1,9 @@
 <?php
 
-namespace DTL\DoctrineCR\Tests\Functional\Path\Storage;
+namespace DoctrineCr\Tests\Functional\Path\Storage;
 
-use DTL\DoctrineCR\Tests\Functional\BaseTestCase;
-use DTL\DoctrineCR\Tests\Functional\Resources\Entity\Page;
+use DoctrineCr\Tests\Functional\BaseTestCase;
+use DoctrineCr\Tests\Functional\Resources\Entity\Page;
 
 /**
  * TODO: Get the storage here.

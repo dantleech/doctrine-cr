@@ -1,9 +1,9 @@
 <?php
 
-namespace DTL\DoctrineCR\Path;
+namespace DoctrineCr\Path;
 
-use DTL\DoctrineCR\Path\Exception\RegistryException;
-use DTL\DoctrineCR\Helper\PathHelper;
+use DoctrineCr\Path\Exception\RegistryException;
+use DoctrineCr\Helper\PathHelper;
 
 class EntryRegistry
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace DTL\DoctrineCR;
+namespace DoctrineCr;
 
 class Events
 {

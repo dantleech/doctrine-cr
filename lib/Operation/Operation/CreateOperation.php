@@ -1,11 +1,11 @@
 <?php
 
-namespace DTL\DoctrineCR\Operation\Operation;
+namespace DoctrineCr\Operation\Operation;
 
-use DTL\DoctrineCR\Path\Entry;
-use DTL\DoctrineCR\Operation\OperationInterface;
-use DTL\DoctrineCR\Path\StorageInterface;
-use DTL\DoctrineCR\Path\EntryRegistry;
+use DoctrineCr\Path\Entry;
+use DoctrineCr\Operation\OperationInterface;
+use DoctrineCr\Path\StorageInterface;
+use DoctrineCr\Path\EntryRegistry;
 
 class CreateOperation implements OperationInterface
 {

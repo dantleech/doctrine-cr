@@ -1,8 +1,8 @@
 <?php
 
-namespace DTL\DoctrineCR\Tests\Unit\Helper;
+namespace DoctrineCr\Tests\Unit\Helper;
 
-use DTL\DoctrineCR\Helper\UuidHelper;
+use DoctrineCr\Helper\UuidHelper;
 
 class UuidHelperTest extends \PHPUnit_Framework_TestCase
 {

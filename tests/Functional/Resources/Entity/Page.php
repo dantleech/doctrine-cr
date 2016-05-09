@@ -1,6 +1,6 @@
 <?php
 
-namespace DTL\DoctrineCR\Tests\Functional\Resources\Entity;
+namespace DoctrineCr\Tests\Functional\Resources\Entity;
 
 class Page
 {
