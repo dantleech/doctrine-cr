@@ -93,7 +93,7 @@ class Container extends BaseContainer
         };
 
         $this['dcr.subscriber'] = function (Container $container) {
-            return new DcrSubscriber($container['dcr.path.manager'], $container['dcr.metadata.factory'], $container['orm.entity_manager']);
+            return new DcrSubscriber($container['dcr.path.manager'], $container['dcr.metadata.factory']);
         };
 
         $this['dcr.object_manager'] = function (Container $container) {

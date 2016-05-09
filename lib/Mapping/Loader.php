@@ -4,30 +4,27 @@ namespace DoctrineCr\Mapping;
 
 use DoctrineCr\Path\StorageInterface;
 use Metadata\MetadataFactory;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 use DoctrineCr\Helper\PathHelper;
 use DoctrineCr\Collection\ChildrenCollection;
 use DoctrineCr\Path\PathManager;
+use Doctrine\Common\Persistence\ObjectManager;
 
 class Loader
 {
     private $metadataFactory;
     private $pathManager;
-    private $entityManager;
 
     public function __construct(
         PathManager $pathManager, 
-        MetadataFactory $metadataFactory,
-        EntityManager $entityManager
+        MetadataFactory $metadataFactory
     )
     {
         $this->pathManager = $pathManager;
         $this->metadataFactory = $metadataFactory;
-        $this->entityManager = $entityManager;
     }
 
-    public function mapToObject($object)
+    public function mapToObject(ObjectManager $objectManager, $object)
     {
         $crMetadata = $this->metadataFactory->getMetadataForClass(ClassUtils::getRealClass(get_class($object)));
 
@@ -59,7 +56,7 @@ class Loader
             if ($parentPath !== '/') {
                 $parentEntry = $this->pathManager->getByPath($parentPath);
                 $parentCrMetadata = $this->metadataFactory->getMetadataForClass($parentEntry->getClassFqn());
-                $parent = $this->entityManager->getReference(
+                $parent = $objectManager->getReference(
                     $parentEntry->getClassFqn(),
                     $parentEntry->getUuid()
                 );
@@ -75,7 +72,7 @@ class Loader
         foreach ($crMetadata->getChildrenMappings() as $childrenMapping) {
 
             $children = new ChildrenCollection(
-                $this->entityManager,
+                $objectManager,
                 $this->metadataFactory,
                 $this->pathManager,
                 $pathEntry

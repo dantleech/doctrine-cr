@@ -2,123 +2,24 @@
 
 namespace DoctrineCr\Subscriber;
 
-use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Events;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use DoctrineCr\Path\StorageInterface;
-use DoctrineCr\Events as DcrEvents;
-use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
-use Metadata\MetadataFactory;
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
-use DoctrineCr\Helper\PathHelper;
-use DoctrineCr\Path\Exception\PathNotFoundException;
-use DoctrineCr\Collection\ChildrenCollection;
-use DoctrineCr\Mapping\Mapper;
-use DoctrineCr\Mapping\MetadataLoader;
-use DoctrineCr\Mapping\Loader;
 use DoctrineCr\Path\PathManager;
-use Doctrine\ORM\Event\PreFlushEventArgs;
-use DoctrineCr\Mapping\Persister;
-use DoctrineCr\Event\MoveEvent;
+use Metadata\MetadataFactory;
 
-class DcrSubscriber implements EventSubscriber
+class DcrSubscriber extends AbstractDcrSubscriber
 {
     private $pathManager;
-    private $metadataFactory;
-    private $entityManager;
 
     public function __construct(
         PathManager $pathManager, 
-        MetadataFactory $metadataFactory,
-        EntityManager $entityManager // TODO: This is available in the event, not required here.
+        MetadataFactory $metadataFactory
     )
     {
+        parent::__construct($metadataFactory);
         $this->pathManager = $pathManager;
-        $this->metadataFactory = $metadataFactory;
-        $this->entityManager = $entityManager;
-
-        $this->loader = new Loader(
-            $pathManager,
-            $metadataFactory,
-            $entityManager
-        );
-        $this->metadataLoader = new MetadataLoader(
-            $this->metadataFactory
-        );
-        $this->persister = new Persister(
-            $pathManager,
-            $metadataFactory
-        );
     }
 
-    public function getSubscribedEvents()
+    protected function getPathManager()
     {
-        return [
-            DcrEvents::prePersist,
-            DcrEvents::postPersist,
-            DcrEvents::postMove,
-            Events::preRemove,
-            Events::postLoad,
-            // pre flush is always raised
-            Events::preFlush, 
-            Events::loadClassMetadata,
-        ];
-    }
-
-    public function loadClassMetadata(LoadClassMetadataEventArgs $args)
-    {
-        $this->metadataLoader->loadMetadata($args->getClassMetadata());
-    }
-
-    public function postLoad(LifecycleEventArgs $args)
-    {
-        $this->loader->mapToObject($args->getObject());
-    }
-
-    public function dcrPrePersist(LifecycleEventArgs $args)
-    {
-        $new = $this->persister->persist($args->getObject());
-    }
-
-    public function dcrPostPersist(LifecycleEventArgs $args)
-    {
-        $this->updateEntities();
-    }
-
-    public function dcrPostMove(MoveEvent $args)
-    {
-        $this->updateEntities();
-    }
-
-    public function preFlush(PreFlushEventArgs $args)
-    {
-        $this->pathManager->flush();
-    }
-
-    public function preRemove(LifecycleEventArgs $args)
-    {
-        $object = $args->getObject();
-        $metadata = $this->metadataFactory->getMetadataForClass(ClassUtils::getRealClass(get_class($object)));
-
-        if (!$metadata->isManaged()) {
-            return;
-        }
-
-        $this->pathManager->remove($metadata->getUuidValue($object));
-    }
-
-    /**
-     * Update any entities that have been affected by a path change.
-     */
-    private function updateEntities()
-    {
-        $updateQueue = $this->pathManager->getUpdateQueue();
-
-        while (false === $updateQueue->isEmpty()) {
-            $entry = $updateQueue->dequeue();
-            $object = $this->entityManager->find($entry->getClassFqn(), $entry->getUuid());
-            $this->loader->mapToObject($object);
-        }
+        return $this->pathManager;
     }
 }

@@ -2,16 +2,17 @@
 
 namespace DoctrineCr\Event;
 
-use Doctrine\Common\EventArgs;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\Event\ManagerEventArgs;
 
-class MoveEvent extends EventArgs
+class MoveEvent extends ManagerEventArgs
 {
     private $srcUuid;
     private $destPath;
 
     public function __construct(ObjectManager $objectManager, $srcUuid, $destPath)
     {
+        parent::__construct($objectManager);
         $this->srcUuid = $srcUuid;
         $this->destPath = $destPath;
     }
