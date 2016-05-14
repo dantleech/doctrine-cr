@@ -19,4 +19,15 @@ class Schema extends BaseSchema
         $table->setPrimaryKey(['uuid']);
         $table->addUniqueIndex(['path', 'uuid']);
     }
+
+    public function mergeTo(BaseSchema $schema) 
+    {
+        foreach ($this->getTables() as $table) {
+            $schema->_addTable($table);
+        }
+
+        foreach ($this->getSequences() as $sequence) {
+            $schema->_addSequence($sequence);
+        }
+    }
 }

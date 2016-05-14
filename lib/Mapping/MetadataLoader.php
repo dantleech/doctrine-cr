@@ -24,10 +24,10 @@ class MetadataLoader
         $parentProperty = $crMetadata->getParentProperty();
 
         if (null === $uuidProperty) {
-            throw new \RuntimeException(
+            throw new \RuntimeException(sprintf(
                 'No property has been mapped as a "UUID" field in class "%s"',
-                $crMetadata->getName()
-            );
+                $crMetadata->name
+            ));
         }
 
         if (null === $nameProperty) {
