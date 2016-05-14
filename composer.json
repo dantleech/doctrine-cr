@@ -12,7 +12,8 @@
         "doctrine/dbal": "^2.5",
         "ramsey/uuid": "^3.4",
         "jms/metadata": "^1.5",
-        "doctrine/orm": "^2.5"
+        "doctrine/orm": "^2.5",
+        "phpbench/dom": "dev-master"
     },
     "require-dev": {
         "symfony/filesystem": "^3.0",
